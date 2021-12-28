@@ -1,0 +1,71 @@
+name: Linter & Tests
+
+on:
+  pull_request:
+    branches: [master, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SETTINGS_MODULE: example_project.settings
+      PYLINT_MIN_SCORE: 9.20
+      PYLINT_DIRECTORIES: certego_saas example_project
+      FLAKE_DIRECTORIES: .
+      BLAKE_DIRECTORIES: .
+      ISORT_DIRECTORIES: .
+      MYPY_DIRECTORIES: .
+      STRIPE_TEST_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
+
+      - name: "Lint: flake8"
+        run: |
+          flake8 ${FLAKE_DIRECTORIES} --config=.flake8 --show-source
+
+      - name: "Lint: black formatter"
+        run: |
+          black ${BLACK_DIRECTORIES} --check --diff
+
+      - name: "Lint: isort"
+        run: |
+          isort ${ISORT_DIRECTORIES} --profile black --filter-files --check-only --diff --skip venv
+
+      - name: "Lint: pylint"
+        run: |
+          pylint ${PYLINT_DIRECTORIES} --exit-zero > output.txt
+          cat output.txt
+          SCORE=$(tail -2 output.txt | head -1 | grep -Po "\d+(\.\d*)?|\.\d+" | head -1)
+          echo $SCORE
+          echo $PYLINT_MIN_SCORE
+          RES=$( echo $SCORE'<'$PYLINT_MIN_SCORE | bc -l) #if score greater equal pylint_min_score then res=0 else res=1
+          echo $RES
+          exit $RES
+        shell: bash
+
+      - name: "type checking: mypy"
+        run: |
+          mypy ${MYPY_DIRECTORIES}
+        shell: bash
+
+      - name: "Test: tests.*"
+        timeout-minutes: 5
+        run: |
+          coverage run \
+          --parallel-mode --concurrency=multiprocessing \
+          manage.py test tests \
+          --failfast --noinput -parallel 4
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1

@@ -1,0 +1,10 @@
+[run]
+branch = True
+source = certego_saas
+omit =
+    tests/*
+[report]
+skip_covered=True
+omit =
+    tests/*
+sort = cover

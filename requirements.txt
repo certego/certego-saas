@@ -1,0 +1,18 @@
+# django libs
+Django ~= 3.2.9
+django-filter ~= 21.1
+django-cache-memoize ~= 0.1.10
+django-ses ~= 2.3.0
+django-user-agents ~= 0.4.0
+djangorestframework ~= 3.13.0
+drf-spectacular ~= 0.20.2
+drf-flex-fields == 0.9.1
+djangorestframework-filters ~= 1.0.0.dev2
+drf-recaptcha == 2.0.4
+django-rest-email-auth
+django-rest-durin
+
+# other
+slack_sdk ~= 3.11.2
+stripe ~= 2.61.0
+python-twitter ~= 3.5

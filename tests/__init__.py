@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from certego_saas.models import User
 

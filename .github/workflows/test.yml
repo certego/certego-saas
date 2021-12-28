@@ -1,8 +1,8 @@
-name: Linter & Tests
+name: Lint & Tests
 
 on:
   pull_request:
-    branches: [master, develop]
+    branches: [main, develop]
 
 jobs:
   test:
@@ -14,7 +14,7 @@ jobs:
       FLAKE_DIRECTORIES: .
       BLAKE_DIRECTORIES: .
       ISORT_DIRECTORIES: .
-      MYPY_DIRECTORIES: .
+      MYPY_DIRECTORIES: certego_saas example_project
       STRIPE_TEST_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
 
     steps:
@@ -62,10 +62,7 @@ jobs:
       - name: "Test: tests.*"
         timeout-minutes: 5
         run: |
-          coverage run \
-          --parallel-mode --concurrency=multiprocessing \
-          manage.py test tests \
-          --failfast --noinput -parallel 4
+          coverage run manage.py test tests --failfast --noinput
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

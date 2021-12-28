@@ -10,7 +10,6 @@ from django.dispatch import receiver
 from certego_saas.apps.organization.models import Membership, Organization
 from certego_saas.apps.payments.models import Customer, Subscription
 
-
 __all__ = [
     "User",
 ]

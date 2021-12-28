@@ -11,7 +11,7 @@ STAGE_CI = True
 HOST_URI = "http://localhost"
 HOST_NAME = "ExampleProject"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
     # default
     "django.contrib.admin",
@@ -119,4 +119,6 @@ REST_DURIN = {
     "API_ACCESS_RESPONSE_INCLUDE_TOKEN": True,
 }
 
-CERTEGO_SAAS = {}
+CERTEGO_SAAS = {
+    "ORGANIZATION_MAX_MEMBERS": 5,
+}

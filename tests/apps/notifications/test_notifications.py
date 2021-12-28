@@ -5,7 +5,6 @@ from certego_saas.apps.notifications.models import Notification
 
 from ... import CustomTestCase, setup
 
-
 notification_list_uri = reverse("notification-list")
 
 

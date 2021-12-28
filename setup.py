@@ -2,7 +2,8 @@
 # certego-saas
 """
 from pathlib import Path
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 # constants
 GITHUB_URL = "https://github.com/certego/certego-saas"

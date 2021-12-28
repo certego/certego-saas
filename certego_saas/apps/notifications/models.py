@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 
-from certego_saas.ext.models import TimestampedModel, AppSpecificModel
+from certego_saas.ext.models import AppSpecificModel, TimestampedModel
 
 
 class Notification(TimestampedModel, AppSpecificModel):

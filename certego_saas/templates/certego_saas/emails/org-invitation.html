@@ -1,0 +1,21 @@
+{% extends "./base.html" %} {% block content %}
+<div>
+  Hello, {{ username }}!
+
+  <p>
+    You have been invited to join the Certego organization
+    <b>{{ organization_name }}</b> by user @{{ organization_owner_username }}.
+  </p>
+  <p>
+    Click
+    <a href="{{ invitation_uri }}" target="_blank" rel="noopener noreferrer"
+      >here</a
+    >
+    to view and manage your invitations on {{ host_uri }}.
+  </p>
+  <p>
+    Note: If the above link doesn't work, please sign in on {{ host_uri }} and
+    navigate to "Organization -> Invitations".
+  </p>
+</div>
+{% endblock %}

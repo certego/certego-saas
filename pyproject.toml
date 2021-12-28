@@ -1,0 +1,21 @@
+[tool.black]
+exclude = '''
+/(
+  venv
+  | node_modules
+  | venv3.7
+  | venv3.8
+  | venv3.9
+)/
+'''
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+ignore_missing_imports = true
+exclude = "private_docs"
+
+[tool.django-stubs]
+django_settings_module = "example_project.settings"

@@ -2,10 +2,9 @@ from django.db import transaction
 from django.test import tag
 from rest_framework.reverse import reverse
 
-from certego_saas.apps.organization.models import Organization, Membership, Invitation
+from certego_saas.apps.organization.models import Invitation, Membership, Organization
 
-from ... import CustomTestCase, setup_custom_user, User
-
+from ... import CustomTestCase, User, setup_custom_user
 
 org_invite_uri = reverse("user_organization-invite")
 invitations_uri = reverse("user_invitations-list")

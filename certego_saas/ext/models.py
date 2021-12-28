@@ -1,10 +1,9 @@
 from django.conf import settings
-
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.utils.functional import classproperty
-from django.core.exceptions import ImproperlyConfigured
 
-from .managers import ToggleableModelManager, AppSpecificModelManager
+from .managers import AppSpecificModelManager, ToggleableModelManager
 
 
 class AppChoices(models.TextChoices):
@@ -14,10 +13,10 @@ class AppChoices(models.TextChoices):
 
     @classproperty
     def CURRENTAPP(cls) -> str:
-        if settings.STAGE_CI:
-            return cls.DRAGONFLY  # in case of tests
+        if settings.STAGE_CI:  # in case of tests
+            return cls.DRAGONFLY
         try:
-            return cls[settings.HOST_NAME.upper()]
+            return cls[settings.HOST_NAME.upper()]  # type: ignore
         except KeyError:
             raise ImproperlyConfigured("Incorrect HOST_NAME set")
 

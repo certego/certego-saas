@@ -2,10 +2,9 @@ from django.db import transaction
 from django.test import tag
 from rest_framework.reverse import reverse
 
-from certego_saas.apps.organization.models import Organization, Membership, Invitation
+from certego_saas.apps.organization.models import Invitation, Membership, Organization
 
-from ... import CustomTestCase, setup_custom_user, User
-
+from ... import CustomTestCase, User, setup_custom_user
 
 org_uri = reverse("user_organization-list")
 org_leave_uri = reverse("user_organization-leave")

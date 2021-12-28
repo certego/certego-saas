@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict
+from typing import Dict, List, Tuple
 
 import stripe
 from django.conf import settings
@@ -8,10 +8,10 @@ from django.db import models, transaction
 
 from certego_saas.ext.models import AppChoices, AppSpecificModel
 
+from .apps import CertegoPaymentsConfig
 from .cache import cache_memoize
 from .exceptions import CustomerWithoutSubscription
 from .utils import get_default_product
-from .apps import CertegoPaymentsConfig
 
 
 class Customer(models.Model):

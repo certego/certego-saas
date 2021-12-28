@@ -2,11 +2,11 @@ from typing import Tuple
 
 from rest_framework.test import APIClient
 
-from certego_saas.models import User, Customer, Subscription
 from certego_saas.apps.payments.consts import (
     TEST_ADMIN_CUSTOMER_ID,
     TEST_ADMIN_DF_SUBSCRIPTION_ID,
 )
+from certego_saas.models import Customer, Subscription, User
 
 # flake8: noqa
 from ... import CustomTestCase

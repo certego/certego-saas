@@ -1,5 +1,5 @@
-from rest_framework import serializers as rfs
 from rest_flex_fields.serializers import FlexFieldsModelSerializer
+from rest_framework import serializers as rfs
 
 from .models import User
 

@@ -8,6 +8,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     env:
+      DJANGO_SETTINGS_MODULE: example_project.settings
       PYLINT_MIN_SCORE: 9.20
       PYLINT_DIRECTORIES: certego_saas example_project
       FLAKE_DIRECTORIES: .
@@ -82,9 +83,6 @@ jobs:
 
       - name: "Test: tests.*"
         timeout-minutes: 5
-        run: |
-
-      - name: "Test: tests.*"
         run: |
           # run tests with coverage
           tox

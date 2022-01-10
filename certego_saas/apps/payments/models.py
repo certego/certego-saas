@@ -15,6 +15,13 @@ from .exceptions import CustomerWithoutSubscription
 from .utils import get_default_product
 
 
+__all__ = [
+    "AppChoices",
+    "Customer",
+    "Subscription",
+]
+
+
 class Customer(models.Model):
     """
     A wrapper class over ``stripe-python`` SDK
@@ -269,6 +276,7 @@ class Subscription(AppSpecificModel):
             "cancel_at_period_end": active_sub.cancel_at_period_end,
             "canceled_at": active_sub.canceled_at,
             "product": {
+                "id": product.id,
                 "name": product.name,
                 "description": product.description,
                 "metadata": product.metadata,

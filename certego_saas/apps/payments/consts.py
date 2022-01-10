@@ -12,6 +12,8 @@ CERTEGO_USERS_PRODUCT_NAME = "Certego_Internal"
 # for local development/testing
 TEST_ADMIN_CUSTOMER_ID = "cus_KHkAVst4QtdUow"
 TEST_ADMIN_DF_SUBSCRIPTION_ID = "sub_1JyZeuFdd9yl5D0d24Wb0f4r"
+TEST_ADMIN_DF_PRODUCT_ID = "prod_KHjKIZ2FJHKHrk"
+TEST_ADMIN_IO_PRODUCT_ID = "prod_KteBrO2aApO5pS"
 
 
 # webhook

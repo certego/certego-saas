@@ -17,6 +17,7 @@ def get_products() -> List[Dict]:
         if product.active:
             prod_price_list.append(
                 {
+                    "id": product.id,
                     "name": product.name,
                     "description": product.description,
                     "metadata": product.metadata,
@@ -44,7 +45,6 @@ def get_products_prices_map() -> Dict[str, Dict]:
         }
         product_price_map[price_id] = obj
         product_price_map[product_id] = obj
-        product_price_map[product_name] = obj
 
     return product_price_map
 

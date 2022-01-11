@@ -7,6 +7,7 @@ djangorestframework >= 3.13.0
 drf-spectacular >= 0.21.1
 drf-flex-fields >= 0.9.6
 djangorestframework-filters >= 1.0.0.dev2
+django-email-utils >= 1.0, < 2.0
 django-rest-durin @ https://github.com/eshaan7/django-rest-durin/tarball/dev-sessions-19#egg=django-rest-durin
 
 # other

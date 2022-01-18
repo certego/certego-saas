@@ -3,19 +3,18 @@ from typing import List, Tuple, Union
 from cache_memoize import cache_memoize
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser as DjangoAbstractUser
 from django.db import models
 from django.dispatch import receiver
 
 from certego_saas.apps.organization.models import Membership, Organization
-from certego_saas.apps.payments.models import Customer, Subscription
 
 __all__ = [
     "User",
 ]
 
 
-class User(AbstractUser):
+class User(DjangoAbstractUser):
     """Custom User Model
 
     * ref:
@@ -66,16 +65,6 @@ class User(AbstractUser):
     def has_membership(self) -> bool:
         return hasattr(self, "membership") and self.membership is not None
 
-    # stripe
-
-    def has_customer(self) -> bool:
-        return hasattr(self, "customer") and self.customer is not None
-
-    def get_or_create_customer(self) -> Tuple[Customer, bool]:
-        if self.has_customer():
-            return self.customer, False
-        return Customer._create_customer(user_id=self.pk)
-
     # ORM
 
     @property
@@ -88,22 +77,34 @@ class User(AbstractUser):
             return any(verified_cumulative)
         return None  # case: LDAP/manually created user
 
-    # df specific
-
-    @classmethod
-    @property
-    def INTEGRATIONS(cls) -> List["User"]:
-        """
-        We have to update this with the integration users
-        """
-        return [
-            User.objects.get_or_create(username="abuse-ch", email="dragonfly@abuse.ch")[
-                0
-            ],  # malware bazaar
-        ]
-
 
 if apps.is_installed("certego_saas.apps.payments"):
+    from certego_saas.apps.payments.models import Customer, Subscription
+
+    class User(User):
+        def has_customer(self) -> bool:
+            return hasattr(self, "customer") and self.customer is not None
+
+        def get_or_create_customer(self) -> Tuple[Customer, bool]:
+            if self.has_customer():
+                return self.customer, False
+            return Customer._create_customer(user_id=self.pk)
+
+        # df specific
+
+        @classmethod
+        @property
+        def INTEGRATIONS(cls) -> List["User"]:
+            """
+            We have to update this with the integration users
+            """
+            return [
+                User.objects.get_or_create(
+                    username="abuse-ch", email="dragonfly@abuse.ch"
+                )[
+                    0
+                ],  # malware bazaar
+            ]
 
     @receiver(models.signals.post_save, sender=User)
     def post_save_user_handler(sender, instance: User, created: bool, **kwargs):

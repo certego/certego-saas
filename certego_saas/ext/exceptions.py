@@ -94,14 +94,10 @@ def _should_log(exc, context) -> bool:
     if view:
         code = getattr(exc, "status_code", None)
         viewname = view.__class__.__name__
-        if (
-            (code == 404 or exc.__class__.__name__ == "Http404")
-            and viewname
-            in [
-                "APIAccessTokenView",
-                "OrganizationViewSet",
-            ]
-        ) or (code == 403 and viewname in ["get_user_subscription"]):
+        if (code == 404 or exc.__class__.__name__ == "Http404") and viewname in [
+            "APIAccessTokenView",
+            "OrganizationViewSet",
+        ]:
             flag = False
 
     return flag

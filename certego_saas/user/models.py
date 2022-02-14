@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-class User(DjangoAbstractUser):
+class AbstractUser(DjangoAbstractUser):
     """Custom User Model
 
     * ref:
@@ -31,6 +31,7 @@ class User(DjangoAbstractUser):
     # meta
 
     class Meta:
+        abstract = True
         app_label = "certego_saas"
 
     # utils
@@ -81,7 +82,10 @@ class User(DjangoAbstractUser):
 if apps.is_installed("certego_saas.apps.payments"):
     from certego_saas.apps.payments.models import Customer, Subscription
 
-    class User(User):
+    class User(AbstractUser):
+        class Meta:
+            app_label = "certego_saas"
+
         def has_customer(self) -> bool:
             return hasattr(self, "customer") and self.customer is not None
 
@@ -143,3 +147,10 @@ if apps.is_installed("certego_saas.apps.payments"):
             return
 
         customer, _ = instance.get_or_create_customer()
+
+
+else:
+
+    class User(AbstractUser):
+        class Meta:
+            app_label = "certego_saas"

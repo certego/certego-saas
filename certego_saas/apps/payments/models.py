@@ -14,7 +14,6 @@ from .cache import cache_memoize
 from .exceptions import CustomerWithoutSubscription
 from .utils import get_default_product
 
-
 __all__ = [
     "AppChoices",
     "Customer",

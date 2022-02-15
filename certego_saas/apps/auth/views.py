@@ -42,7 +42,6 @@ class LoginView(durin_views.LoginView):
 
 class LogoutView(durin_views.LogoutView):
     def post(self, request, *args, **kwargs) -> Response:
-        super().post(request, *args, **kwargs)
         uname = request.user.username
         logger.info(f"LogoutView: request from '{uname}''.")
         response = super(LogoutView, self).post(request, *args, **kwargs)

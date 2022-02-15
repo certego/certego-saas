@@ -6,6 +6,7 @@ SECRET_KEY = "averysecurerandomsecret"
 DEBUG = True
 PUBLIC_DEPLOYMENT = True
 STAGE_PRODUCTION = False
+STAGE = "ci"
 STAGE_LOCAL = False
 STAGE_CI = True
 HOST_URI = "http://localhost"

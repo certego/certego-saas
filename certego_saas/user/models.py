@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 from cache_memoize import cache_memoize
 from django.apps import apps
@@ -58,18 +58,18 @@ class AbstractUser(DjangoAbstractUser):
         if isinstance(other, User):
             if not other.has_membership():
                 return False
-            return self.membership.organization == other.membership.organization
+            return self.membership.organization == other.membership.organization  # type: ignore
         if isinstance(other, Organization):
-            return self.membership.organization == other
+            return self.membership.organization == other  # type: ignore
         raise RuntimeError(f"Other is not User or Organization, but {type(other)}")
 
     def has_membership(self) -> bool:
-        return hasattr(self, "membership") and self.membership is not None
+        return hasattr(self, "membership") and self.membership is not None  # type: ignore
 
     # ORM
 
     @property
-    def is_email_verified(self) -> Union[bool, None]:
+    def is_email_verified(self) -> Optional[bool]:
         """
         True if verified, False if not, None if LDAP/manually created user
         """
@@ -151,6 +151,6 @@ if apps.is_installed("certego_saas.apps.payments"):
 
 else:
 
-    class User(AbstractUser):
+    class User(AbstractUser):  # type: ignore
         class Meta:
             app_label = "certego_saas"

@@ -20,7 +20,10 @@ class UserFeedback(TimestampedModel, AppSpecificModel):
     ]
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="feedbacks",
     )
     category = models.CharField(max_length=32, choices=FEEDBACK_CATEGORIES)
     message = models.TextField(null=False, blank=False)

@@ -2,7 +2,6 @@ from django.core.cache import cache
 from django.test import tag
 from durin.models import AuthToken, Client
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 from certego_saas.settings import certego_apps_settings
 
@@ -37,9 +36,6 @@ class TestAuth(CustomTestCase):
         self.user = User.objects.create_user(
             self.creds["username"], self.email, self.creds["password"]
         )
-        # setup client
-        self.client = APIClient()
-        self.client.cookies
         return super().setUp()
 
     def tearDown(self):
@@ -56,8 +52,7 @@ class TestAuth(CustomTestCase):
         self.assertEqual(AuthToken.objects.count(), 0)
 
         response = self.client.post(login_uri, self.creds, format="json")
-        content = response.json()
-        msg = (response, content)
+        msg = (response, "response data should be null but response should set cookie")
 
         self.assertEqual(response.status_code, 200, msg=msg)
         self.assertIn(
@@ -66,16 +61,32 @@ class TestAuth(CustomTestCase):
 
         self.assertEqual(AuthToken.objects.count(), 1)
 
-    def test_logout_204(self):
+    def test_logout_tokenauth_204(self):
         self.assertEqual(AuthToken.objects.count(), 0)
 
         token = AuthToken.objects.create(
             user=self.user,
-            client=Client.objects.create(name="test_logout_deletes_keys"),
+            client=Client.objects.create(name="test_logout_tokenauth_204"),
         )
         self.assertEqual(AuthToken.objects.count(), 1)
 
         self.client.credentials(HTTP_AUTHORIZATION=("Token %s" % token.token))
+        response = self.client.post(logout_uri)
+
+        self.assertEqual(response.status_code, 204, msg=(response))
+        self.assertEqual(
+            AuthToken.objects.count(), 0, "other tokens should remain after logout"
+        )
+
+    def test_logout_cookieauth_204(self):
+        self.assertEqual(AuthToken.objects.count(), 0)
+
+        token = AuthToken.objects.create(
+            user=self.user,
+            client=Client.objects.create(name="test_logout_cookieauth_204"),
+        )
+        self.assertEqual(AuthToken.objects.count(), 1)
+        self.client.cookies[certego_apps_settings.AUTH_TOKEN_COOKIE_NAME] = token.token
         response = self.client.post(logout_uri)
 
         self.assertEqual(response.status_code, 204, msg=(response))

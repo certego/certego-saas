@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema
 
-from certego_saas.ext.viewsets import CreateOnlyViewSet
 from certego_saas.ext.throttling import POSTUserRateThrottle
+from certego_saas.ext.viewsets import CreateOnlyViewSet
 
 from .models import UserFeedback
 from .serializers import UserFeedbackSerializer

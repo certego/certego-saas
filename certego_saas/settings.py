@@ -23,6 +23,7 @@ USER_SETTINGS = getattr(settings, "CERTEGO_SAAS", None)
 
 DEFAULTS = {
     # app settings
+    "AUTH_TOKEN_COOKIE_NAME": "CERTEGO_SAAS_AUTH_TOKEN",
     "FILTER_NOTIFICATIONS_VIEW_FOR_CURRENTAPP": True,
     "USER_ACCESS_SERIALIZER": "certego_saas.user.serializers.UserAccessSerializer",
     "ORGANIZATION_MAX_MEMBERS": 3,

@@ -49,7 +49,7 @@ class _Slack(_SlackInterface):
         message = f"*{title.title()}*\n{body}"
         if urgent:
             message = message.upper()
-        message = f"`{'PUBLIC' if settings.PUBLIC_DEPLOYMENT else 'PRIVATE'} INSTANCE`:\n{message}"
+        message = f"`{settings.STAGE.upper()} INSTANCE`:\n{message}"
         try:
             return self.client.chat_postMessage(
                 channel=channel, text=message, mrkdwn=True

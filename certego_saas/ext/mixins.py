@@ -4,6 +4,8 @@ from typing import Dict
 from django.http import HttpResponse
 from rest_framework.generics import GenericAPIView
 
+from .serializers import RecaptchaV2Serializer
+
 
 class ExportCsvAdminMixin:
     def export_as_csv(self, request, queryset):
@@ -40,3 +42,19 @@ class SerializerActionMixin(GenericAPIView):
             return self.serializer_action_classes[self.action]
         except (KeyError, AttributeError):
             return super(SerializerActionMixin, self).get_serializer_class()
+
+
+class RecaptchaV2Mixin(GenericAPIView):
+    """
+    Mixin that hooks the ``RecaptchaV2Serializer`` into ``get_serializer()``.
+    The hook is applied only if ``self.request.method`` is ``POST``.
+    """
+
+    def get_serializer(self, *args, **kwargs):
+        if self.request.method == "POST":
+            # first validate against the recaptcha serializer
+            recaptcha_serializer = RecaptchaV2Serializer(
+                data=self.request.data, context=self.get_serializer_context()
+            )
+            recaptcha_serializer.is_valid(raise_exception=True)
+        return super().get_serializer(*args, **kwargs)

@@ -36,6 +36,7 @@ class LoginView(durin_views.LoginView):
             secure=False if settings.STAGE_CI or settings.DEBUG else True,
             httponly=certego_apps_settings.AUTH_COOKIE_HTTPONLY,
             samesite=certego_apps_settings.AUTH_COOKIE_SAMESITE,
+            domain=certego_apps_settings.AUTH_COOKIE_DOMAIN,
         )
         return response
 
@@ -48,5 +49,6 @@ class LogoutView(durin_views.LogoutView):
         response.delete_cookie(
             key=certego_apps_settings.AUTH_TOKEN_COOKIE_NAME,
             samesite=certego_apps_settings.AUTH_COOKIE_SAMESITE,
+            domain=certego_apps_settings.AUTH_COOKIE_DOMAIN,
         )
         return response

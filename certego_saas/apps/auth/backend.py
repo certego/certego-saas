@@ -1,5 +1,5 @@
-from rest_framework.request import Request
 from durin import auth
+from rest_framework.request import Request
 
 from certego_saas.settings import certego_apps_settings
 

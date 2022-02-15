@@ -1,22 +1,19 @@
 import logging
 
 from django.conf import settings
-from rest_framework import status
-from rest_framework.response import Response
 from django_user_agents.utils import get_user_agent
 from durin import views as durin_views
 from durin.models import Client
+from rest_framework import status
+from rest_framework.response import Response
 
 from certego_saas.settings import certego_apps_settings
-
 
 logger = logging.getLogger(__name__)
 
 __all__ = [
     "LoginView",
     "LogoutView",
-    "APIAccessTokenView",
-    "TokenSessionsViewSet",
 ]
 
 
@@ -55,7 +52,3 @@ class LogoutView(durin_views.LogoutView):
             samesite="Strict",
         )
         return response
-
-
-APIAccessTokenView = durin_views.APIAccessTokenView
-TokenSessionsViewSet = durin_views.TokenSessionsViewSet

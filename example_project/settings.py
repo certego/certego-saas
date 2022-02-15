@@ -5,10 +5,10 @@ SECRET_KEY = "averysecurerandomsecret"
 
 DEBUG = True
 PUBLIC_DEPLOYMENT = True
-STAGE_PRODUCTION = False
 STAGE = "ci"
-STAGE_LOCAL = False
-STAGE_CI = True
+STAGE_PRODUCTION = STAGE == "production"
+STAGE_LOCAL = STAGE == "local"
+STAGE_CI = STAGE == "ci"
 HOST_URI = "http://localhost"
 HOST_NAME = "ExampleProject"
 
@@ -120,6 +120,11 @@ REST_DURIN = {
     "API_ACCESS_EXCLUDE_FROM_SESSIONS": True,
     "API_ACCESS_RESPONSE_INCLUDE_TOKEN": True,
 }
+
+# drf-recaptcha
+DRF_RECAPTCHA_SECRET_KEY = ""
+DRF_RECAPTCHA_TESTING = STAGE_CI
+DRF_RECAPTCHA_TESTING_PASS = True
 
 CERTEGO_SAAS = {
     "ORGANIZATION_MAX_MEMBERS": 5,

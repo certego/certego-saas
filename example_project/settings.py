@@ -98,7 +98,9 @@ CACHES = {
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
     # Auth
-    "DEFAULT_AUTHENTICATION_CLASSES": ["durin.auth.TokenAuthentication"],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "certego_saas.apps.auth.backend.CookieTokenAuthentication"
+    ],
     # Pagination
     "DEFAULT_PAGINATION_CLASS": "certego_saas.ext.pagination.CustomPageNumberPagination",
     "PAGE_SIZE": 10,

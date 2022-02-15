@@ -6,7 +6,7 @@ from certego_saas.settings import certego_apps_settings
 TOKEN_COOKIE_NAME = certego_apps_settings.AUTH_TOKEN_COOKIE_NAME
 
 
-class TokenAuthentication(auth.TokenAuthentication):
+class CookieTokenAuthentication(auth.TokenAuthentication):
     def authenticate(self, request: Request):
         if TOKEN_COOKIE_NAME in request.COOKIES:
             token_bytes = request.COOKIES[TOKEN_COOKIE_NAME].encode()
@@ -14,7 +14,7 @@ class TokenAuthentication(auth.TokenAuthentication):
         return super().authenticate(request)
 
 
-class CachedTokenAuthentication(auth.CachedTokenAuthentication):
+class CachedCookieTokenAuthentication(auth.CachedTokenAuthentication):
     def authenticate(self, request: Request):
         if TOKEN_COOKIE_NAME in request.COOKIES:
             token_bytes = request.COOKIES[TOKEN_COOKIE_NAME].encode()

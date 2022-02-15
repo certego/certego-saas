@@ -34,9 +34,8 @@ class LoginView(durin_views.LoginView):
             value=token_obj.token,
             expires=token_obj.expiry,
             secure=False if settings.STAGE_CI or settings.DEBUG else True,
-            httponly=True,
-            samesite="Strict",
-            # secure=True,
+            httponly=certego_apps_settings.AUTH_COOKIE_HTTPONLY,
+            samesite=certego_apps_settings.AUTH_COOKIE_SAMESITE,
         )
         return response
 
@@ -49,6 +48,6 @@ class LogoutView(durin_views.LogoutView):
         response = super(LogoutView, self).post(request, *args, **kwargs)
         response.delete_cookie(
             key=certego_apps_settings.AUTH_TOKEN_COOKIE_NAME,
-            samesite="Strict",
+            samesite=certego_apps_settings.AUTH_COOKIE_SAMESITE,
         )
         return response

@@ -15,4 +15,4 @@ from .serializers import UserFeedbackSerializer
 class UserFeedbackCreateViewSet(CreateOnlyViewSet):
     queryset = UserFeedback.objects.all()
     serializer_class = UserFeedbackSerializer
-    throttle_classes = [POSTUserRateThrottle]
+    throttle_classes = [POSTUserRateThrottle]  # type: ignore

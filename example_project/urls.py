@@ -8,6 +8,8 @@ urlpatterns = [
     # certego_saas:
     # default apps (user),
     path("api/", include("certego_saas.urls")),
+    # feedback sub-app
+    path("api/", include("certego_saas.apps.feedback.urls")),
     # notifications sub-app
     path("api/", include("certego_saas.apps.notifications.urls")),
     # organization sub-app

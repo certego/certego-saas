@@ -6,6 +6,7 @@ SECRET_KEY = "averysecurerandomsecret"
 DEBUG = True
 PUBLIC_DEPLOYMENT = True
 STAGE_PRODUCTION = False
+STAGE = "ci"
 STAGE_LOCAL = False
 STAGE_CI = True
 HOST_URI = "http://localhost"
@@ -27,6 +28,7 @@ INSTALLED_APPS = [
     # project apps (certego libs)
     "durin",
     "certego_saas",
+    "certego_saas.apps.feedback",
     "certego_saas.apps.notifications",
     "certego_saas.apps.organization",
     "certego_saas.apps.payments",

@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     # project apps (certego libs)
     "durin",
     "certego_saas",
+    "certego_saas.apps.auth",
     "certego_saas.apps.feedback",
     "certego_saas.apps.notifications",
     "certego_saas.apps.organization",
@@ -97,7 +98,9 @@ CACHES = {
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
     # Auth
-    "DEFAULT_AUTHENTICATION_CLASSES": ["durin.auth.TokenAuthentication"],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "certego_saas.apps.auth.backend.CookieTokenAuthentication"
+    ],
     # Pagination
     "DEFAULT_PAGINATION_CLASS": "certego_saas.ext.pagination.CustomPageNumberPagination",
     "PAGE_SIZE": 10,

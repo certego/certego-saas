@@ -2,6 +2,8 @@ from typing import Dict, List
 
 import stripe
 
+from certego_saas.ext.models import AppChoices
+
 from .cache import cache_memoize
 from .consts import CERTEGO_USERS_PRODUCT_NAME, PUBLIC_PRODUCT_NAME, STRIPE_LIVE_MODE
 
@@ -37,14 +39,16 @@ def get_products_prices_map() -> Dict[str, Dict]:
         price_id = price.id
         product_id = price.product.id
         product_name = price.product.name
+        appname = price.product.metadata["appname"]
         obj = {
             "id": product_id,
+            "price_id": price_id,
             "name": product_name,
             "metadata": price.product.metadata,
-            "price_id": price_id,
         }
         product_price_map[price_id] = obj
         product_price_map[product_id] = obj
+        product_price_map[f"{product_name}__{appname}"] = obj
 
     return product_price_map
 
@@ -54,12 +58,13 @@ def get_default_product() -> dict:
     returns default product based on
     whether stripe is running in livemode or testmode
     """
+
     if STRIPE_LIVE_MODE:
         # public deployment
-        name = PUBLIC_PRODUCT_NAME
+        name = f"{PUBLIC_PRODUCT_NAME}__{AppChoices.CURRENTAPP}"
     else:
         # internal deployment
-        name = CERTEGO_USERS_PRODUCT_NAME
+        name = f"{CERTEGO_USERS_PRODUCT_NAME}__{AppChoices.CURRENTAPP}"
 
     default_product = get_products_prices_map()[name]
 

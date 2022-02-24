@@ -36,6 +36,10 @@ class _FakeSlack(_SlackInterface):
 
 
 class _Slack(_SlackInterface):
+    """
+    Slack client.
+    """
+
     token = certego_apps_settings.SLACK_TOKEN
     channel = certego_apps_settings.SLACK_CHANNEL
 
@@ -44,6 +48,9 @@ class _Slack(_SlackInterface):
     def send_message(
         self, title: str, body: str = "", urgent: bool = False, channel=None
     ):
+        """
+        To send message to a channel.
+        """
         if channel is None:
             channel = self.channel
         message = f"*{title.title()}*\n{body}"
@@ -59,6 +66,7 @@ class _Slack(_SlackInterface):
             raise e
 
 
+#: Slack Client
 Slack: Type[Union[_Slack, _FakeSlack]] = (
     _FakeSlack if settings.STAGE_LOCAL or settings.STAGE_CI else _Slack
 )

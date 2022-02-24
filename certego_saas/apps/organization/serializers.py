@@ -48,7 +48,10 @@ class OrganizationSerializer(FlexFieldsModelSerializer):
         user = self.context["request"].user
         return obj.owner.pk == user.pk
 
-    def create(self, validated_data) -> Organization:
+    def create(self, validated_data: dict) -> Organization:
+        """
+        Create :class:`~.models.Organization` object.
+        """
         return Organization.create(
             name=validated_data["name"], owner=validated_data["owner"]
         )
@@ -72,6 +75,9 @@ class InviteCreateSerializer(rfs.Serializer):
     username = rfs.CharField()
 
     def create(self, validated_data) -> Invitation:
+        """
+        Create :class:`~.models.Invitation` object.
+        """
         request = self.context["request"]
         username: str = validated_data.get("username")
         org: Organization = validated_data.get("organization")

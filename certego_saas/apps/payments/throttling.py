@@ -1,6 +1,3 @@
-"""
-`DRF Throttling <https://www.django-rest-framework.org/api-guide/throttling/>`__
-"""
 from abc import ABCMeta, abstractmethod
 
 from django.utils import timezone

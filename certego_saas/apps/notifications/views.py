@@ -10,9 +10,9 @@ from .filters import NotificationFilter
 from .models import Notification
 from .serializers import NotificationSerializer
 
-__all__ = ["NotificationViewSet"]
-
-""" REST ViewSets """
+__all__ = [
+    "NotificationViewSet",
+]
 
 
 class NotificationViewSet(ReadOnlyViewSet):
@@ -22,6 +22,8 @@ class NotificationViewSet(ReadOnlyViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
+        # if FILTER_NOTIFICATIONS_VIEW_FOR_CURRENTAPP is True then,
+        # filter notifications queryset using `AppChoices.CURRENTAPP`.
         if certego_apps_settings.FILTER_NOTIFICATIONS_VIEW_FOR_CURRENTAPP:
             qs = qs.filter_currentapp()
         return qs

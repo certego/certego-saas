@@ -7,6 +7,10 @@ __all__ = ["NotificationFilter"]
 
 
 class NotificationFilter(filters.FilterSet):
+    """
+    Used in :class:`~.views.NotificationViewSet`.
+    """
+
     read = filters.BooleanFilter(method="filter_for_read")
 
     def filter_for_read(self, queryset, value, read, *args, **kwargs):

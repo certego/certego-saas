@@ -19,6 +19,10 @@ logger = logging.getLogger(__name__)
 
 
 class Organization(TimestampedModel):
+    """
+    ``Organization`` model is related to ``User`` model
+    through the ``Membership`` model.
+    """
 
     # fields
 

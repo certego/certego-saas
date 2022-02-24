@@ -7,12 +7,15 @@ __all__ = ["cache_memoize", "get_cache"]
 
 
 def cache_memoize(*args, **kwargs):
+    """
+    Custom ``cache_memoize``.
+    """
     return _cache_memoize(*args, **kwargs, cache_alias=CACHE_ALIAS)
 
 
 def get_cache():
     """
-    tries to get the ``api.payments`` cache
+    Attempts to get the ``certego_saas.payments`` cache
     otherwise fallback to ``default`` cache
     """
     try:

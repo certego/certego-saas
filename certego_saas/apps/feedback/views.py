@@ -6,6 +6,10 @@ from certego_saas.ext.viewsets import CreateOnlyViewSet
 from .models import UserFeedback
 from .serializers import UserFeedbackSerializer
 
+__all__ = [
+    "UserFeedbackCreateViewSet",
+]
+
 
 @extend_schema(
     description="""

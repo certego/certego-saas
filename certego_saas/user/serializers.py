@@ -10,6 +10,10 @@ __all__ = [
 
 
 class UserSerializer(FlexFieldsModelSerializer):
+    """
+    Reusable serializer for :class:`~.models.User` model.
+    """
+
     class Meta:
         model = User
         fields = (
@@ -20,10 +24,17 @@ class UserSerializer(FlexFieldsModelSerializer):
             "email",
         )
 
-    full_name = rfs.CharField(source="get_full_name")
-
 
 class UserAccessSerializer(rfs.ModelSerializer):
+    """
+    Used by :class:`~.views.UserAccessView`.
+
+    Ideally, this serializer should be extended inside your
+    service's source code adding user relevant information
+    and then point to it with the
+    ``USER_ACCESS_SERIALIZER`` settings variable.
+    """
+
     class Meta:
         model = User
         fields = ("user",)

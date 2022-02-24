@@ -10,6 +10,11 @@ from .consts import CERTEGO_USERS_PRODUCT_NAME, PUBLIC_PRODUCT_NAME, STRIPE_LIVE
 
 @cache_memoize(60 * 60 * 24)
 def get_products() -> List[Dict]:
+    """
+    Returns list of stripe plans/products.
+
+    Alias for ``stripe.Price.list(expand=["data.product"])``.
+    """
     prices = stripe.Price.list(expand=["data.product"]).data
     prod_price_list = []
     for price in prices:
@@ -33,6 +38,11 @@ def get_products() -> List[Dict]:
 
 @cache_memoize(60 * 60 * 24)
 def get_products_prices_map() -> Dict[str, Dict]:
+    """
+    Returns dict mapping of stripe plans/products.
+
+    Alias for ``stripe.Price.list(expand=["data.product"])``.
+    """
     prices = stripe.Price.list(expand=["data.product"]).data
     product_price_map = {}
     for price in prices:

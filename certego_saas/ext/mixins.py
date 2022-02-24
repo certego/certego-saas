@@ -6,8 +6,18 @@ from rest_framework.generics import GenericAPIView
 
 from .serializers import RecaptchaV2Serializer
 
+__all__ = [
+    "ExportCsvAdminMixin",
+    "SerializerActionMixin",
+    "RecaptchaV2Mixin",
+]
+
 
 class ExportCsvAdminMixin:
+    """
+    Mixin class that can be used with django's ``ModelAdmin``.
+    """
+
     def export_as_csv(self, request, queryset):
         meta = self.model._meta
         field_names = [field.name for field in meta.fields]
@@ -27,7 +37,10 @@ class ExportCsvAdminMixin:
 
 class SerializerActionMixin(GenericAPIView):
     """
-    Define mapping in ``serializer_action_classes`` (``dict``).
+    Mixin that allows defining different serializer class
+    for different view actions.
+    Define mapping inside the class attribute
+    ``serializer_action_classes`` (type: ``dict``).
     """
 
     serializer_action_classes: Dict = {}
@@ -47,7 +60,7 @@ class SerializerActionMixin(GenericAPIView):
 class RecaptchaV2Mixin(GenericAPIView):
     """
     Mixin that hooks the ``RecaptchaV2Serializer`` into ``get_serializer()``.
-    The hook is applied only if ``self.request.method`` is ``POST``.
+    The hook is applied only if request method is ``POST``.
     """
 
     def get_serializer(self, *args, **kwargs):

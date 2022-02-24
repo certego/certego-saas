@@ -3,6 +3,10 @@ from django.db.models import Q
 
 
 class ToggleableModelManager(models.Manager):
+    """
+    For :class:`certego_saas.ext.models.ToggleableModel`.
+    """
+
     def enabled(self):
         return super().get_queryset().filter(enabled=True)
 
@@ -31,6 +35,10 @@ class _AppSpecificQuerySet(models.QuerySet):
 
 
 class AppSpecificModelManager(models.Manager):
+    """
+    For :class:`certego_saas.ext.models.AppSpecificModel`.
+    """
+
     def get_queryset(self):
         return _AppSpecificQuerySet(self.model, using=self._db, hints=self._hints)
 

@@ -16,11 +16,12 @@ Requires python version >=3.8.
 $ pip3 install certego_saas
 ```
 
-- For development/testing, `pip3 install certego_saas[dev]`
+- For development/testing, `pip3 install certego_saas[dev]`.
 
 ## Documentation
 
-- Code reference: Please see [`example_project`](https://github.com/certego/certego-saas/tree/main/example_project).
+- Code reference: [`example_project`](https://github.com/certego/certego-saas/tree/main/example_project).
+- Documentation: https://certego-certego-saas.readthedocs-hosted.com/
 
 ## Projects using certego-saas
 

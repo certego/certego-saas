@@ -63,6 +63,11 @@ class ToggleableModel(models.Model):
 
 
 class AppSpecificModel(models.Model):
+    """
+    Adds a ``appname`` choice field (``AppChoices``) and
+    provides ``get_currentapp`` and ``filter_currentapp`` methods to the queryset and manager.
+    """
+
     appname = models.CharField(
         max_length=32,
         choices=AppChoices.choices,

@@ -17,9 +17,11 @@ class NotificationSerializer(rfs.ModelSerializer):
     read = rfs.SerializerMethodField()
 
     def get_read(self, obj: Notification) -> bool:
+        # `read` property may already be present inside `obj`
+        # see filters.py L15 and L19
         read = getattr(obj, "read", None)
         if read is not None:
             return read
-        # else query again
+        # if not present, query again
         rqst_user = self.context["request"].user
-        return obj.read_by_users.filter(pk=rqst_user.pk).exists()
+        return obj.is_read_by_user(rqst_user)

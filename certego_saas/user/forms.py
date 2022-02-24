@@ -1,10 +1,14 @@
-from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 
-User = get_user_model()
+from .models import User
 
 
 class UserCreateForm(UserCreationForm):
+    """
+    Extending django's ``UserCreationForm`` to add required fields
+    as given in the ``User.REQUIRED_FIELDS``.
+    """
+
     class Meta:
         model = User
         fields = (
@@ -18,6 +22,5 @@ class UserCreateForm(UserCreationForm):
         # first call parent's constructor
         super(UserCreateForm, self).__init__(*args, **kwargs)
         # there's a `fields` property now
-        self.fields["first_name"].required = True
-        self.fields["last_name"].required = True
-        self.fields["email"].required = True
+        for field_name in User.REQUIRED_FIELDS:
+            self.fields[field_name].required = True

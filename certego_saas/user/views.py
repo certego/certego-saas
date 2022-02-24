@@ -23,6 +23,16 @@ __all__ = [
     },
 )
 class UserAccessView(APIView):
+    """
+    This is supposed to be the first endpoint hit
+    by the user when they visit the webapp.
+    Ideally, it should respond with user information,
+    user usage information and user subscription information.
+
+    This view's ``serializer_class`` is populated using the
+    ``USER_ACCESS_SERIALIZER`` settings variable.
+    """
+
     serializer_class = UserAccessSerializer
 
     def get(self, request, *args, **kwargs):

@@ -41,6 +41,10 @@ class _FakeTwitter(_TwitterInterface):
 
 
 class _Twitter(_TwitterInterface):
+    """
+    Twitter client.
+    """
+
     CHARACTER_LIMIT = twitter_lib.api.CHARACTER_LIMIT
     client = twitter_lib.Api(
         consumer_key=certego_apps_settings.TWITTER_CONSUMER_KEY,
@@ -63,6 +67,9 @@ class _Twitter(_TwitterInterface):
         media: List[Union[str, models.FileField]] = None,
         header: str = None,
     ):
+        """
+        To post a tweet.
+        """
         urls = self.__parse(msg)
         msg = strip_tags(msg)
         msg += " ".join(urls)
@@ -87,4 +94,5 @@ class _Twitter(_TwitterInterface):
             ).id
 
 
+#: Twitter Client
 Twitter = _FakeTwitter if settings.STAGE_LOCAL or settings.STAGE_CI else _Twitter

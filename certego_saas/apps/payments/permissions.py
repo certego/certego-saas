@@ -1,7 +1,3 @@
-"""
-`DRF permissions <https://www.django-rest-framework.org/api-guide/permissions/>`__
-"""
-
 from rest_framework.permissions import BasePermission
 
 

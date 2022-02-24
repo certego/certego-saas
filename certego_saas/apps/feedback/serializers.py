@@ -16,6 +16,9 @@ class UserFeedbackSerializer(rfs.ModelSerializer):
     appname = rfs.HiddenField(default=UserFeedback.AppChoices.CURRENTAPP)
 
     def create(self, validated_data: dict) -> UserFeedback:
+        """
+        Create :class:`~.models.UserFeedback` model.
+        """
         feedback = super().create(validated_data)
         # below function does not raise any exception
         # because we should not respond with error

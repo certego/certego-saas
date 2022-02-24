@@ -6,10 +6,20 @@ from rest_framework.views import exception_handler
 
 from certego_saas.apps.payments.consts import STRIPE_SENSITIVE_FIELDS_SET
 
-from .utils import LogBuilder
+from .log import LogBuilder
+
+__all__ = [
+    "custom_exception_handler",
+]
 
 
 def custom_exception_handler(exc, context) -> Optional[Response]:
+    """
+    Extends ``rest_framework.views.exception_handler``.
+
+    - Custom handlers for NotFound, ValidationError, AuthenticationError
+    - Uses :class:`certego_saas.ext.log.LogBuilder` for JSON logging.
+    """
     # If an exception is thrown that we don't explicitly handle here, we want
     # to delegate to the default exception handler offered by DRF. If we do
     # handle this exception type, we will still want access to the response

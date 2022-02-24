@@ -7,6 +7,14 @@ TOKEN_COOKIE_NAME = certego_apps_settings.AUTH_TOKEN_COOKIE_NAME
 
 
 class CookieTokenAuthentication(auth.TokenAuthentication):
+    """
+    Extends ``durin.auth.TokenAuthentication``.
+
+    Authentication backend that checks for auth token inside both:
+    - Cookie with key ``TOKEN_COOKIE_NAME`` (default ``CERTEGO_SAAS_AUTH_TOKEN``)
+    - Header with key ``Authorization``
+    """
+
     def authenticate(self, request: Request):
         if TOKEN_COOKIE_NAME in request.COOKIES:
             token_bytes = request.COOKIES[TOKEN_COOKIE_NAME].encode()
@@ -15,6 +23,14 @@ class CookieTokenAuthentication(auth.TokenAuthentication):
 
 
 class CachedCookieTokenAuthentication(auth.CachedTokenAuthentication):
+    """
+    Extends ``durin.auth.CachedTokenAuthentication``.
+
+    Authentication backend that checks for auth token inside both:
+    - Cookie with key ``TOKEN_COOKIE_NAME`` (default ``CERTEGO_SAAS_AUTH_TOKEN``)
+    - Header with key ``Authorization``
+    """
+
     def authenticate(self, request: Request):
         if TOKEN_COOKIE_NAME in request.COOKIES:
             token_bytes = request.COOKIES[TOKEN_COOKIE_NAME].encode()

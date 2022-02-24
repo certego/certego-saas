@@ -170,6 +170,12 @@ class Customer(models.Model):
 
 
 class Subscription(AppSpecificModel):
+    """
+    Each ``Customer`` can have maximum ``len(AppChoices)`` number of
+    related ``Subscription`` objects; one subscription for
+    each app name (i.e. DRAGONFLY, INTELOWL, etc.).
+    """
+
     # fields
 
     subscription_id = models.CharField(max_length=64, primary_key=True)

@@ -18,6 +18,12 @@ __all__ = [
 
 
 class LoginView(durin_views.LoginView):
+    """
+    Extends ``durin.views.LoginView``.
+
+    Responds with ``Set-cookie`` header and empty response data.
+    """
+
     def get_client_obj(self, request) -> Client:
         client_name = get_user_agent(request)
         client, _ = Client.objects.get_or_create(name=client_name)
@@ -42,6 +48,12 @@ class LoginView(durin_views.LoginView):
 
 
 class LogoutView(durin_views.LogoutView):
+    """
+    Extends ``durin.views.LogoutView``.
+
+    Responds with ``Set-cookie`` header and empty response data.
+    """
+
     def post(self, request, *args, **kwargs) -> Response:
         uname = request.user.username
         logger.info(f"LogoutView: request from '{uname}''.")

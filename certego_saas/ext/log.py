@@ -24,7 +24,7 @@ class LogBuilder:
     ``request``, ``response``, ``view``, ``exception``
     data and logs it.
 
-    * Based on: https://github.com/lingster/drf-api-tracking
+    Based on: https://github.com/lingster/drf-api-tracking
     """
 
     CLEANED_SUBSTITUTE = "********"

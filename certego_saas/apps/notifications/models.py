@@ -3,6 +3,10 @@ from django.db import models
 
 from certego_saas.ext.models import AppSpecificModel, TimestampedModel
 
+__all__ = [
+    "Notification",
+]
+
 
 class Notification(TimestampedModel, AppSpecificModel):
     """
@@ -19,3 +23,6 @@ class Notification(TimestampedModel, AppSpecificModel):
         help_text="To store which users have read a particular notification.",
         blank=True,
     )
+
+    def is_read_by_user(self, user) -> bool:
+        return self.read_by_users.filter(pk=user.pk).exists()

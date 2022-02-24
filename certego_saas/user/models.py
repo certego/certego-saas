@@ -36,6 +36,10 @@ class AbstractUser(DjangoAbstractUser):
 
     # utils
 
+    @property
+    def full_name(self) -> str:
+        return self.get_full_name()
+
     @classmethod
     @cache_memoize(60 * 60)
     def certego(cls) -> "User":

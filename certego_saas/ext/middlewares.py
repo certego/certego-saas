@@ -2,6 +2,11 @@ import time
 
 
 class StatsMiddleware:
+    """
+    Install this middleware if you are using
+    :meth:`certego_saas.ext.exceptions.custom_exception_handler`.
+    """
+
     def __init__(self, get_response):
         self.get_response = get_response
 

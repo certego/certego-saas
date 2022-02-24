@@ -63,11 +63,17 @@ class OrganizationViewSet(GenericViewSet):
         return permissions
 
     def list(self, request):
+        """
+        Get organization.
+        """
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
     def create(self, request):
+        """
+        Create new organization.
+        """
         if request.user.has_membership():
             raise Membership.ExistingMembershipException()
         serializer = self.get_serializer(data=request.data)
@@ -76,15 +82,23 @@ class OrganizationViewSet(GenericViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, *args, **kwargs):
+        """
+        Delete organization (accessible only to the organization owner).
+        """
         instance = self.get_object()
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["POST"])
     def invite(self, request, *args, **kwargs):
+        """
+        Invite user to organization (accessible only to the organization owner).
+
+        ``POST ~/organization/invite``.
+        """
         org = self.get_object()
         write_serializer = InviteCreateSerializer(
-            data=request.data, context={"request": request}
+            data=request.data, context=self.get_serializer_context()
         )
         write_serializer.is_valid(raise_exception=True)
         write_serializer.save(organization=org)
@@ -95,6 +109,11 @@ class OrganizationViewSet(GenericViewSet):
 
     @action(detail=False, methods=["POST"])
     def remove_member(self, request, *args, **kwargs):
+        """
+        Remove user's membership from organization (accessible only to the organization owner).
+
+        ``POST ~/organization/remove_member``.
+        """
         username = request.data.get("username", None)
         if not username:
             raise ValidationError("'username' is required.")
@@ -111,7 +130,9 @@ class OrganizationViewSet(GenericViewSet):
     @action(detail=False, methods=["POST"])
     def leave(self, request, *args, **kwargs):
         """
-        Leave organization. (only members)
+        Leave organization (accessible only to members).
+
+        ``POST ~/organization/leave``.
         """
         if request.user.membership.is_owner:
             raise Membership.OwnerCantLeaveException()
@@ -154,6 +175,9 @@ class InvitationViewSet(ListAndDeleteOnlyViewSet):
         methods=["POST"],
     )
     def accept(self, *args, **kwargs):
+        """
+        Accept an invitation by ID.
+        """
         instance: Invitation = self.get_object()
         instance.accept()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -163,6 +187,9 @@ class InvitationViewSet(ListAndDeleteOnlyViewSet):
         methods=["POST"],
     )
     def decline(self, *args, **kwargs):
+        """
+        Decline an invitation by ID.
+        """
         instance: Invitation = self.get_object()
         instance.decline()
         return Response(status=status.HTTP_204_NO_CONTENT)

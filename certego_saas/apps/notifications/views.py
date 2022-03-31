@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -9,6 +11,8 @@ from certego_saas.settings import certego_apps_settings
 from .filters import NotificationFilter
 from .models import Notification
 from .serializers import NotificationSerializer
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "NotificationViewSet",
@@ -35,6 +39,7 @@ class NotificationViewSet(ReadOnlyViewSet):
         url_name="mark_as_read",
     )
     def mark_as_read(self, request: Request, *args, **kwargs):
+        logger.info(f"mark as read notification from user: {request.user}")
         obj: Notification = self.get_object()
         obj.read_by_users.add(request.user)  # type: ignore
         return Response(status=status.HTTP_204_NO_CONTENT)

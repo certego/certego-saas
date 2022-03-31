@@ -94,9 +94,6 @@ def _handle_stripe_error(exc, context, response) -> Response:
 
 
 def _should_log(exc, context) -> bool:
-    """
-    Reference: https://github.com/certego/Dragonfly/issues/856
-    """
     flag = True
 
     view = context.get("view", None)
@@ -104,7 +101,7 @@ def _should_log(exc, context) -> bool:
     if view:
         code = getattr(exc, "status_code", None)
         viewname = view.__class__.__name__
-        if (code == 404 or exc.__class__.__name__ == "Http404") and viewname in [
+        if (code in [404, 400] or exc.__class__.__name__ == "Http404") and viewname in [
             "APIAccessTokenView",
             "OrganizationViewSet",
         ]:

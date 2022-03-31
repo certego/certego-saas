@@ -62,27 +62,21 @@ class Invitation(TimestampedModel):
 
     class OwnerException(ValidationError):
         default_detail = "Cannot create invitation for organization owner."
-        logger.error(default_detail)
 
     class MaxMemberException(ValidationError):
         default_detail = "Organization reached maximum number of members."
-        logger.error(default_detail)
 
     class AlreadyPresentException(ValidationError):
         default_detail = "Invite failed. User is already part of the organization."
-        logger.error(default_detail)
 
     class AlreadyPendingException(ValidationError):
         default_detail = "A similar invite for the user is already pending."
-        logger.error(default_detail)
 
     class PreviouslyDeclinedException(ValidationError):
         default_detail = "Invitation was previously declined."
-        logger.error(default_detail)
 
     class PreviouslyAcceptedException(ValidationError):
         default_detail = "Invitation was previously accepted."
-        logger.error(default_detail)
 
     # funcs
 

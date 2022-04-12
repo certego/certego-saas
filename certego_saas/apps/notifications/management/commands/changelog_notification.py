@@ -1,7 +1,7 @@
 import argparse
 import os
 import re
-from typing import Tuple, List
+from typing import List, Tuple
 
 import markdown
 from django.core.management.base import BaseCommand

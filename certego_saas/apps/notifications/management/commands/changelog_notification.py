@@ -25,7 +25,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("path", type=str)
-        parser.add_argument("appname", type=str, choices=[elem[0] for elem in AppChoices.choices])
+        parser.add_argument(
+            "appname", type=str, choices=[elem[0] for elem in AppChoices.choices]
+        )
         parser.add_argument("--release", nargs="?", type=str, default=None)
         parser.add_argument(
             "--debug", action=argparse.BooleanOptionalAction, default=False

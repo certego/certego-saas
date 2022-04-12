@@ -10,7 +10,7 @@ STAGE_PRODUCTION = STAGE == "production"
 STAGE_LOCAL = STAGE == "local"
 STAGE_CI = STAGE == "ci"
 HOST_URI = "http://localhost"
-HOST_NAME = "ExampleProject"
+HOST_NAME = "ACCOUNTS"
 
 ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [

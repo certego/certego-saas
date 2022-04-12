@@ -1,3 +1,5 @@
+import logging
+
 from django.db.models import Prefetch
 from rest_flex_fields import is_expanded
 from rest_framework import status
@@ -21,6 +23,8 @@ from .serializers import (
     InviteCreateSerializer,
     OrganizationSerializer,
 )
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["OrganizationViewSet", "InvitationViewSet"]
 
@@ -66,6 +70,7 @@ class OrganizationViewSet(GenericViewSet):
         """
         Get organization.
         """
+        logger.info(f"list organizations from user {request.user}")
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
@@ -74,6 +79,7 @@ class OrganizationViewSet(GenericViewSet):
         """
         Create new organization.
         """
+        logger.info(f"create organizations from user {request.user}")
         if request.user.has_membership():
             raise Membership.ExistingMembershipException()
         serializer = self.get_serializer(data=request.data)
@@ -81,10 +87,11 @@ class OrganizationViewSet(GenericViewSet):
         serializer.save(owner=self.request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, request):
         """
         Delete organization (accessible only to the organization owner).
         """
+        logger.info(f"delete organizations from user {request.user}")
         instance = self.get_object()
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -96,6 +103,9 @@ class OrganizationViewSet(GenericViewSet):
 
         ``POST ~/organization/invite``.
         """
+        logger.info(
+            f"invite to organizations from user {request.user}. Data:{request.data}"
+        )
         org = self.get_object()
         write_serializer = InviteCreateSerializer(
             data=request.data, context=self.get_serializer_context()
@@ -115,6 +125,7 @@ class OrganizationViewSet(GenericViewSet):
         ``POST ~/organization/remove_member``.
         """
         username = request.data.get("username", None)
+        logger.info(f"remove member {username} from user {request.user}")
         if not username:
             raise ValidationError("'username' is required.")
         org = self.get_object()
@@ -134,6 +145,7 @@ class OrganizationViewSet(GenericViewSet):
 
         ``POST ~/organization/leave``.
         """
+        logger.info(f"leave membership org from user {request.user}")
         if request.user.membership.is_owner:
             raise Membership.OwnerCantLeaveException()
         request.user.membership.delete()
@@ -174,10 +186,11 @@ class InvitationViewSet(ListAndDeleteOnlyViewSet):
         detail=True,
         methods=["POST"],
     )
-    def accept(self, *args, **kwargs):
+    def accept(self, request, *args, **kwargs):
         """
         Accept an invitation by ID.
         """
+        logger.info(f"accept invitation to org from user {request.user}")
         instance: Invitation = self.get_object()
         instance.accept()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -186,10 +199,11 @@ class InvitationViewSet(ListAndDeleteOnlyViewSet):
         detail=True,
         methods=["POST"],
     )
-    def decline(self, *args, **kwargs):
+    def decline(self, request, *args, **kwargs):
         """
         Decline an invitation by ID.
         """
+        logger.info(f"decline invitation to org from user {request.user}")
         instance: Invitation = self.get_object()
         instance.decline()
         return Response(status=status.HTTP_204_NO_CONTENT)

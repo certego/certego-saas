@@ -1,3 +1,5 @@
+import logging
+
 import email_utils
 from django.conf import settings
 from django.db import models, transaction
@@ -7,6 +9,9 @@ from certego_saas.ext.models import TimestampedModel
 
 from .apps import CertegoOrganizationConfig
 from .membership import Membership
+
+logger = logging.getLogger(__name__)
+
 
 __all__ = ["Invitation"]
 

@@ -13,12 +13,10 @@ class AppChoices(models.TextChoices):
 
     @classproperty
     def CURRENTAPP(cls) -> str:
-        if settings.STAGE_CI:  # in case of tests
-            return cls.DRAGONFLY
         try:
             return cls[settings.HOST_NAME.upper()]  # type: ignore
         except KeyError:
-            raise ImproperlyConfigured("Incorrect HOST_NAME set")
+            raise ImproperlyConfigured(f"Incorrect HOST_NAME: {settings.HOST_NAME} set")
 
 
 class TimestampedModel(models.Model):

@@ -152,7 +152,6 @@ if apps.is_installed("certego_saas.apps.payments"):
 
         customer, _ = instance.get_or_create_customer()
 
-
 else:
 
     class User(AbstractUser):  # type: ignore

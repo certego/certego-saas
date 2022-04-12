@@ -12,7 +12,7 @@ jobs:
       PYLINT_MIN_SCORE: 9.20
       PYLINT_DIRECTORIES: certego_saas example_project
       FLAKE_DIRECTORIES: .
-      BLAKE_DIRECTORIES: .
+      BLACK_DIRECTORIES: .
       ISORT_DIRECTORIES: .
       MYPY_DIRECTORIES: certego_saas example_project
 

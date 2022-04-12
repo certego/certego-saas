@@ -19,7 +19,7 @@ class AppChoices(models.TextChoices):
         try:
             return cls[settings.HOST_NAME.upper()]  # type: ignore
         except KeyError:
-            raise ImproperlyConfigured("Incorrect HOST_NAME set")
+            raise ImproperlyConfigured(f"Incorrect HOST_NAME: {settings.HOST_NAME} set")
 
 
 class TimestampedModel(models.Model):

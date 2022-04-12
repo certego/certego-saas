@@ -78,7 +78,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self._read_file(options["path"])
         tag_and_body = self._get_release(
-            options["number-of-releases"], options["release"]
+            options["number_of_releases"], options["release"]
         )
         for tag, body in tag_and_body:
             self.stdout.write(self.style.SUCCESS(f"Version {tag}"))

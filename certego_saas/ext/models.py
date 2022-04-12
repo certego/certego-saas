@@ -13,9 +13,6 @@ class AppChoices(models.TextChoices):
 
     @classproperty
     def CURRENTAPP(cls) -> str:
-        if settings.STAGE_CI and not settings.HOST_NAME:
-            return cls.DRAGONFLY
-
         try:
             return cls[settings.HOST_NAME.upper()]  # type: ignore
         except KeyError:

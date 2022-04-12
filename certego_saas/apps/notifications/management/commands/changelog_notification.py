@@ -29,6 +29,7 @@ class Command(BaseCommand):
             "appname", type=str, choices=[elem[0] for elem in AppChoices.choices]
         )
         parser.add_argument("--release", nargs="?", type=str, default=None)
+        parser.add_argument("--number-of-releases", nargs="?", type=int, default=3)
         parser.add_argument(
             "--debug", action=argparse.BooleanOptionalAction, default=False
         )
@@ -38,7 +39,9 @@ class Command(BaseCommand):
             raise FileNotFoundError(f"File {path} not found")
         self.markdown = open(path, "r", encoding="utf-8").read()
 
-    def _get_release(self, release: str = None) -> List[Tuple[str, str]]:
+    def _get_release(
+        self, number_of_releases: int, release: str = None
+    ) -> List[Tuple[str, str]]:
         versions = re.findall(self.version_regex, self.markdown)
         # remove [v ]
         versions = [v[2:-1] for v in versions]
@@ -51,7 +54,10 @@ class Command(BaseCommand):
                 body = self._get_body(release, index)
                 return [(release, body)]
         else:
-            return [(versions[i], self._get_body(versions[i], i)) for i in range(3)]
+            return [
+                (versions[i], self._get_body(versions[i], i))
+                for i in range(number_of_releases)
+            ]
 
     def _get_body(self, tag: str, position: int) -> str:
         body = re.split(rf"##\s{self.version_regex}", self.markdown)[position + 1]
@@ -70,9 +76,10 @@ class Command(BaseCommand):
             )
 
     def handle(self, *args, **options):
-
         self._read_file(options["path"])
-        tag_and_body = self._get_release(options["release"])
+        tag_and_body = self._get_release(
+            options["number-of-releases"], options["release"]
+        )
         for tag, body in tag_and_body:
             self.stdout.write(self.style.SUCCESS(f"Version {tag}"))
             if options["debug"]:

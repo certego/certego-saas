@@ -25,7 +25,7 @@ class NoLogsTestCase(unittest.TestCase):
                     )
 
     def no_logs(self):
-        with self.assertNoLogs(level=self.max_logging_level):
+        with self.assertNoLogs(logger=None, level=self.max_logging_level):
             self.test_method()
 
     def run(self, result=None):

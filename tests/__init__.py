@@ -22,6 +22,9 @@ def setup_custom_user(user: User) -> APIClient:
 
 
 class CustomTestCase(APITestCase, NoLogsTestCase, TimedTestCase):
+    def setUp(self) -> None:
+        self.max_logging_level = logging.CRITICAL
+
     def assertNoLogs(self, logger=None, level=None):
         if not logger:
             logger = logging.getLogger()

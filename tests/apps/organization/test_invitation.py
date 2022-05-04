@@ -16,7 +16,6 @@ invitations_uri = reverse("user_invitations-list")
 class TestInvitation(CustomTestCase):
     @transaction.atomic
     def setUp(self):
-        self.max_logging_level = logging.CRITICAL
         Membership.objects.all().delete()
         Organization.objects.all().delete()
         Invitation.objects.all().delete()

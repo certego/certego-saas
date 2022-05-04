@@ -27,7 +27,6 @@ class TestOrganization(CustomTestCase):
 
     @transaction.atomic
     def setUp(self):
-        self.max_logging_level = logging.CRITICAL
         Membership.objects.all().delete()
         Organization.objects.all().delete()
         self.user1.refresh_from_db()

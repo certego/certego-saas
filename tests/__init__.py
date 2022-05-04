@@ -28,4 +28,4 @@ class CustomTestCase(APITestCase, NoLogsTestCase, TimedTestCase):
     def assertNoLogs(self, logger=None, level=None):
         if not logger:
             logger = logging.getLogger()
-        return super().assertNoLogs(logger, level)
+        return NoLogsTestCase.assertNoLogs(self, logger, level)

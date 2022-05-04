@@ -3,6 +3,7 @@ from typing import Tuple
 from rest_framework.test import APIClient, APITestCase
 
 from certego_saas.models import User
+from tests.no_logs import NoLogsTestCase
 
 
 def setup() -> Tuple[APIClient, User]:
@@ -18,5 +19,5 @@ def setup_custom_user(user: User) -> APIClient:
     return client
 
 
-class CustomTestCase(APITestCase):
+class CustomTestCase(APITestCase, NoLogsTestCase):
     pass

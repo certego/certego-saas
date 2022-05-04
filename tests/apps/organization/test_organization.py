@@ -1,3 +1,5 @@
+import logging
+
 from django.db import transaction
 from django.test import tag
 from rest_framework.reverse import reverse
@@ -100,7 +102,8 @@ class TestOrganization(CustomTestCase):
 
         # /remove_member API call
         self.client.force_authenticate(user=self.user2)
-        response = self.client.delete(org_uri)
+        with self.assertLogs(level=logging.ERROR):
+            response = self.client.delete(org_uri)
 
         # assert API response
         self.assertEqual(403, response.status_code, msg=response)

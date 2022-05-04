@@ -4,7 +4,8 @@ from typing import Tuple
 from rest_framework.test import APIClient, APITestCase
 
 from certego_saas.models import User
-from tests.no_logs import NoLogsTestCase
+from tests.no_logs_test_case import NoLogsTestCase
+from tests.timed_test_case import TimedTestCase
 
 
 def setup() -> Tuple[APIClient, User]:
@@ -20,7 +21,7 @@ def setup_custom_user(user: User) -> APIClient:
     return client
 
 
-class CustomTestCase(APITestCase, NoLogsTestCase):
+class CustomTestCase(APITestCase, NoLogsTestCase, TimedTestCase):
     def assertNoLogs(self, logger=None, level=None):
         if not logger:
             logger = logging.getLogger()

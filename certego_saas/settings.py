@@ -8,7 +8,7 @@ from rest_framework.settings import APISettings
 # placeholder for later
 get_secret = os.environ.get
 
-
+TEST_RUNNER = "tests.timed_runner.TimedRunner"
 # stripe-python
 STRIPE_LIVE_MODE = (
     settings.PUBLIC_DEPLOYMENT and not settings.STAGE_CI and not settings.DEBUG

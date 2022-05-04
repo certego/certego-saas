@@ -5,7 +5,6 @@ from rest_framework.test import APIClient, APITestCase
 
 from certego_saas.models import User
 from tests.no_logs_test_case import NoLogsTestCase
-from tests.timed_test_case import TimedTestCase, TimedTextTestRunner
 
 
 def setup() -> Tuple[APIClient, User]:
@@ -21,9 +20,7 @@ def setup_custom_user(user: User) -> APIClient:
     return client
 
 
-class CustomTestCase(APITestCase, NoLogsTestCase, TimedTestCase):
-    test_runner = TimedTextTestRunner
-
+class CustomTestCase(APITestCase, NoLogsTestCase):
     def setUp(self) -> None:
         self.max_logging_level = logging.CRITICAL
 

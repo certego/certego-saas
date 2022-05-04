@@ -1,7 +1,7 @@
 import sys
-import unittest
 from time import time
 from unittest import TextTestResult, TextTestRunner
+from django.test.runner import DiscoverRunner
 
 
 class TimedTextTestResult(TextTestResult):
@@ -26,5 +26,5 @@ class TimedTextTestRunner(TextTestRunner):
     stream = sys.stdout
 
 
-class TimedTestCase(unittest.TestCase):
+class TimedRunner(DiscoverRunner):
     test_runner = TimedTextTestRunner

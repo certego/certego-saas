@@ -12,7 +12,7 @@ django-rest-durin==1.0.0
 drf-recaptcha >= 2.0.7
 
 # other
-slack_sdk == 3.11.2
-stripe == 2.61.0
-python-twitter == 3.5
-Markdown==3.3.6
+slack_sdk >= 3.11.2
+stripe >= 2.61.0
+python-twitter ~= 3.5
+Markdown ~= 3.3.6

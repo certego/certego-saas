@@ -1,3 +1,5 @@
+import logging
+
 from django.db import transaction
 from django.test import tag
 from rest_framework.reverse import reverse
@@ -71,7 +73,8 @@ class TestInvitation(CustomTestCase):
 
         # delete invitation
         self.client.force_authenticate(user=self.user2)
-        response = self.__delete_invitation_api(self.invitation.id)
+        with self.assertLogs(level=logging.ERROR):
+            response = self.__delete_invitation_api(self.invitation.id)
 
         # assert for API response
         self.assertEqual(403, response.status_code, msg=response)

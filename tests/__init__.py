@@ -1,3 +1,4 @@
+import logging
 from typing import Tuple
 
 from rest_framework.test import APIClient, APITestCase
@@ -20,4 +21,7 @@ def setup_custom_user(user: User) -> APIClient:
 
 
 class CustomTestCase(APITestCase, NoLogsTestCase):
-    pass
+    def assertNoLogs(self, logger=None, level=None):
+        if not logger:
+            logger = logging.getLogger()
+        return super().assertNoLogs(logger, level)

@@ -1,9 +1,7 @@
-
 import rest_framework_filters as filters
 from django.db.models import Value
 
 from .models import Notification
-
 
 __all__ = ["NotificationFilter"]
 

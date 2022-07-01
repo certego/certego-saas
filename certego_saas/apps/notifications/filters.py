@@ -19,11 +19,11 @@ class NotificationFilter(filters.FilterSet):
 
     def filter_for_read(self, queryset, value, read, *args, **kwargs):
         logger.debug(f"filter_for_read: {value}")
-        if read is True or read == "True":
+        if read is True or read == "true":
             return queryset.filter(read_by_users__in=[self.request.user]).annotate(
                 read=Value(True)
             )
-        if read is False or read == "False":
+        if read is False or read == "false":
             return queryset.exclude(read_by_users__in=[self.request.user]).annotate(
                 read=Value(False)
             )

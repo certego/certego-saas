@@ -24,6 +24,23 @@ class NotificationViewSet(ReadOnlyViewSet):
     serializer_class = NotificationSerializer
     filter_class = NotificationFilter
 
+    # i have absolutely no fucking idea on why the fuck the filtering class is not working, so i'm just doing it manually
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        if "read" in request.query_params:
+            value = request.query_params["read"]
+            if value == "true":
+                queryset = queryset.filter(read_by_users__in=[self.request.user])
+            elif value == "false":
+                queryset = queryset.exclude(read_by_users__in=[self.request.user])
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def get_queryset(self):
         qs = super().get_queryset()
         # if FILTER_NOTIFICATIONS_VIEW_FOR_CURRENTAPP is True then,

@@ -31,7 +31,7 @@ DEFAULTS = {
     "AUTH_COOKIE_SAMESITE": "Strict",
     "AUTH_COOKIE_DOMAIN": None,
     "FILTER_NOTIFICATIONS_VIEW_FOR_CURRENTAPP": True,
-    "USER_ACCESS_SERIALIZER": "certego_saas.user.serializers.UserAccessSerializer",
+    "USER_ACCESS_SERIALIZER": "certego_saas.apps.user.serializers.UserAccessSerializer",
     "ORGANIZATION_MAX_MEMBERS": 3,
     # app info
     "HOST_URI": settings.HOST_URI,

@@ -8,7 +8,7 @@ from .forms import UserCreateForm
 class AbstractUserAdmin(DjangoUserAdmin, ExportCsvAdminMixin):
     """
     An abstract admin class for the
-    :class:`certego_saas.user.models.User` model.
+    :class:`certego_saas.apps.user.models.User` model.
     """
 
     add_form = UserCreateForm

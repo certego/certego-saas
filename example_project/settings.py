@@ -118,7 +118,7 @@ REST_FRAMEWORK = {
 }
 
 REST_DURIN = {
-    "USER_SERIALIZER": "certego_saas.user.serializers.UserSerializer",
+    "USER_SERIALIZER": "certego_saas.apps.user.serializers.UserSerializer",
     "REFRESH_TOKEN_ON_LOGIN": True,
     "API_ACCESS_CLIENT_NAME": "Example project API",
     "API_ACCESS_EXCLUDE_FROM_SESSIONS": True,

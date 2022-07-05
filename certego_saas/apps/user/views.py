@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from certego_saas.ext.serializers import APIExceptionSerializer
 from certego_saas.ext.views import APIView
 
-from ..settings import certego_apps_settings
+from certego_saas.settings import certego_apps_settings
 
 UserAccessSerializer = certego_apps_settings.USER_ACCESS_SERIALIZER
 

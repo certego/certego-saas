@@ -2,7 +2,6 @@ from django.test import tag
 from rest_framework.reverse import reverse
 
 from certego_saas.settings import certego_apps_settings
-
 from tests import CustomTestCase, setup
 
 user_access_uri = reverse("user_access")

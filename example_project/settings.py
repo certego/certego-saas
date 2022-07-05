@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     # project apps (certego libs)
     "durin",
     "certego_saas",
+    "certego_saas.apps.user",
     "certego_saas.apps.auth",
     "certego_saas.apps.feedback",
     "certego_saas.apps.notifications",

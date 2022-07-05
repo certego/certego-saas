@@ -1,5 +1,4 @@
-from django.db import migrations
-
+from django.db import OperationalError, migrations
 from django.db.migrations.operations.base import Operation
 
 
@@ -24,10 +23,12 @@ class AlterCertegoSaasUser(Operation):
                 "certego_saas_user_user_user_permissions",
             ],
         ):
-
-            schema_editor.execute(
-                f"ALTER TABLE {'IF EXISTS' if vendor == 'postgresql' else ''} {old} RENAME TO {new};"
-            )
+            try:
+                schema_editor.execute(
+                    f"ALTER TABLE {'IF EXISTS' if vendor == 'postgresql' else ''} {old} RENAME TO {new};"
+                )
+            except OperationalError:
+                pass
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         vendor = schema_editor.connection.vendor
@@ -43,9 +44,12 @@ class AlterCertegoSaasUser(Operation):
                 "certego_saas_user_user_user_permissions",
             ],
         ):
-            schema_editor.execute(
-                f"ALTER TABLE {'IF EXISTS' if vendor == 'postgresql' else ''} {new} RENAME TO {old};"
-            )
+            try:
+                schema_editor.execute(
+                    f"ALTER TABLE {'IF EXISTS' if vendor == 'postgresql' else ''} {new} RENAME TO {old};"
+                )
+            except OperationalError:
+                pass
 
     def describe(self):
         return "Alter Certego_saas_user table if necessary"

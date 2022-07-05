@@ -86,7 +86,6 @@ if apps.is_installed("certego_saas.apps.payments"):
     from certego_saas.apps.payments.models import Customer, Subscription
 
     class User(AbstractUser):
-
         def has_customer(self) -> bool:
             return hasattr(self, "customer") and self.customer is not None
 

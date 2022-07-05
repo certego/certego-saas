@@ -1,11 +1,11 @@
 # flake8: noqa
 from django.apps import apps
 
-
 __all__ = []
 
 if apps.is_installed("certego_saas.apps.user"):
     from .apps.user.models import User
+
     __all__ += ["User"]
 
 

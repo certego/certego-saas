@@ -80,7 +80,7 @@ USE_L10N = True
 USE_TZ = True
 STATIC_URL = "/static/"
 
-AUTH_USER_MODEL = "certego_saas.User"
+AUTH_USER_MODEL = "certego_saas_user.User"
 
 # certego_saas
 

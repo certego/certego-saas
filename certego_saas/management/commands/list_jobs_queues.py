@@ -4,7 +4,6 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 
-
 class QueueNotFoundException(Exception):
     """Exception raised in case the queue name is not found in the list of available queues"""
 
@@ -61,7 +60,9 @@ class Command(BaseCommand):
                     QueueUrl=queue,
                     AttributeNames=["ApproximateNumberOfMessages"],
                 )
-                message_in_the_queue = queue_data["Attributes"]["ApproximateNumberOfMessages"]
+                message_in_the_queue = queue_data["Attributes"][
+                    "ApproximateNumberOfMessages"
+                ]
                 self.stdout.write(
                     f"the number of the messages in the queue {queue} is {message_in_the_queue}"
                 )

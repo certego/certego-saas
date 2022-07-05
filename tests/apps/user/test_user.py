@@ -3,7 +3,7 @@ from rest_framework.reverse import reverse
 
 from certego_saas.settings import certego_apps_settings
 
-from .. import CustomTestCase, setup
+from tests import CustomTestCase, setup
 
 user_access_uri = reverse("user_access")
 UserAccessSerializer = certego_apps_settings.USER_ACCESS_SERIALIZER  # import string

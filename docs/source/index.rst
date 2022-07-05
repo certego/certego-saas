@@ -10,6 +10,7 @@ Directory Structure
    apps/                             optional/extra apps
    |- auth/                          "certego_saas.apps.auth" app (optional)
    |  |- backend.py                  authentication backend
+   |- user/                           User model, UserAccessSerializer serializer, etc.
    |- feedback/                      "certego_saas.apps.feedback" app (optional)
    |- notifications/                 "certego_saas.apps.notifications" app (optional)
    |- organization/                  "certego_saas.apps.organization" app (not exactly optional)
@@ -24,7 +25,6 @@ Directory Structure
    templates/
    |- certego_saas/                  E-mail templates
    |- context_processors.py          custom context processor
-   user/                             User model, UserAccessSerializer serializer, etc.
    apps.py                           "certego_saas" app
    models.py                         default models
    settings.py                       default settings/configurations

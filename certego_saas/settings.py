@@ -10,9 +10,12 @@ get_secret = os.environ.get
 
 TEST_RUNNER = "tests.timed_runner.TimedRunner"
 # stripe-python
-STRIPE_LIVE_MODE = (
-    settings.PUBLIC_DEPLOYMENT and not settings.STAGE_CI and not settings.DEBUG
-)
+try:
+    STRIPE_LIVE_MODE = (
+        settings.PUBLIC_DEPLOYMENT and not settings.STAGE_CI and not settings.DEBUG
+    )
+except AttributeError:
+    STRIPE_LIVE_MODE = False
 stripe.api_key = str(
     get_secret("STRIPE_LIVE_SECRET_KEY", None)
     if STRIPE_LIVE_MODE
@@ -28,7 +31,7 @@ DEFAULTS = {
     "AUTH_COOKIE_SAMESITE": "Strict",
     "AUTH_COOKIE_DOMAIN": None,
     "FILTER_NOTIFICATIONS_VIEW_FOR_CURRENTAPP": True,
-    "USER_ACCESS_SERIALIZER": "certego_saas.user.serializers.UserAccessSerializer",
+    "USER_ACCESS_SERIALIZER": "certego_saas.apps.user.serializers.UserAccessSerializer",
     "ORGANIZATION_MAX_MEMBERS": 3,
     # app info
     "HOST_URI": settings.HOST_URI,

@@ -3,6 +3,7 @@ import enum
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
+
 try:
     # Django 3.1 and above
     from django.utils.functional import classproperty
@@ -12,10 +13,11 @@ except ImportError:
 from .managers import AppSpecificModelManager, ToggleableModelManager
 
 
-class AppChoices(enum.Enum):
+class AppChoices(str, enum.Enum):
     ACCOUNTS = "ACCOUNTS"
     DRAGONFLY = "DRAGONFLY"
     INTELOWL = "INTELOWL"
+    QUOKKA_PUBLIC = "QUOKKA_PUBLIC"
 
     @classproperty
     def CURRENTAPP(cls) -> str:
@@ -26,7 +28,9 @@ class AppChoices(enum.Enum):
 
     @classproperty
     def choices(cls):
-        return [(member.value, member.value.replace("_", " ").title()) for member in cls]
+        return [
+            (member.value, member.value.replace("_", " ").title()) for member in cls
+        ]
 
 
 class TimestampedModel(models.Model):

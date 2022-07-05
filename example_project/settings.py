@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     # project apps (certego libs)
     "durin",
     "certego_saas",
+    "certego_saas.apps.user",
     "certego_saas.apps.auth",
     "certego_saas.apps.feedback",
     "certego_saas.apps.notifications",
@@ -79,7 +80,7 @@ USE_L10N = True
 USE_TZ = True
 STATIC_URL = "/static/"
 
-AUTH_USER_MODEL = "certego_saas.User"
+AUTH_USER_MODEL = "certego_saas_user.User"
 
 # certego_saas
 
@@ -117,7 +118,7 @@ REST_FRAMEWORK = {
 }
 
 REST_DURIN = {
-    "USER_SERIALIZER": "certego_saas.user.serializers.UserSerializer",
+    "USER_SERIALIZER": "certego_saas.apps.user.serializers.UserSerializer",
     "REFRESH_TOKEN_ON_LOGIN": True,
     "API_ACCESS_CLIENT_NAME": "Example project API",
     "API_ACCESS_EXCLUDE_FROM_SESSIONS": True,

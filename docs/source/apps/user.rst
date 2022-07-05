@@ -1,11 +1,11 @@
-User (``certego_saas.user``)
+User (``certego_saas.apps.user``)
 ====================================
 
 ``admin.py``
 ------------------
 ------------------
 
-.. automodule:: certego_saas.user.admin
+.. automodule:: certego_saas.apps.user.admin
    :members:
    :show-inheritance:
 
@@ -13,7 +13,7 @@ User (``certego_saas.user``)
 ------------------
 ------------------
 
-.. automodule:: certego_saas.user.models
+.. automodule:: certego_saas.apps.user.models
    :members:
    :show-inheritance:
    :exclude-members: DoesNotExist, MultipleObjectsReturned
@@ -22,7 +22,7 @@ User (``certego_saas.user``)
 ------------------
 ------------------
 
-.. automodule:: certego_saas.user.serializers
+.. automodule:: certego_saas.apps.user.serializers
    :members:
    :show-inheritance:
 
@@ -30,7 +30,7 @@ User (``certego_saas.user``)
 ------------------
 ------------------
 
-.. automodule:: certego_saas.user.views
+.. automodule:: certego_saas.apps.user.views
    :members:
    :show-inheritance:
    :exclude-members: get_object, get_permissions, get_queryset, get_serializer

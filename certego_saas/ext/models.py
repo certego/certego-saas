@@ -1,3 +1,5 @@
+import enum
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
@@ -10,7 +12,7 @@ except ImportError:
 from .managers import AppSpecificModelManager, ToggleableModelManager
 
 
-class AppChoices(models.TextChoices):
+class AppChoices(enum.Enum):
     ACCOUNTS = "ACCOUNTS"
     DRAGONFLY = "DRAGONFLY"
     INTELOWL = "INTELOWL"
@@ -21,6 +23,10 @@ class AppChoices(models.TextChoices):
             return cls[settings.HOST_NAME.upper()]  # type: ignore
         except KeyError:
             raise ImproperlyConfigured(f"Incorrect HOST_NAME: {settings.HOST_NAME} set")
+
+    @classproperty
+    def choices(cls):
+        return [(member.value, member.value.replace("_", " ").title()) for member in cls]
 
 
 class TimestampedModel(models.Model):

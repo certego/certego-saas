@@ -12,18 +12,40 @@ class AlterCertegoSaasUser(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         vendor = schema_editor.connection.vendor
 
-        for old, new in zip(["certego_saas_user", "certego_saas_user_groups", "certego_saas_user_user_permissions"],
-                            ["certego_saas_user_user", "certego_saas_user_user_groups",
-                             "certego_saas_user_user_user_permissions"]):
+        for old, new in zip(
+            [
+                "certego_saas_user",
+                "certego_saas_user_groups",
+                "certego_saas_user_user_permissions",
+            ],
+            [
+                "certego_saas_user_user",
+                "certego_saas_user_user_groups",
+                "certego_saas_user_user_user_permissions",
+            ],
+        ):
 
-            schema_editor.execute(f"ALTER TABLE {'IF EXISTS' if vendor == 'postgresql' else ''} {old} RENAME TO {new};")
+            schema_editor.execute(
+                f"ALTER TABLE {'IF EXISTS' if vendor == 'postgresql' else ''} {old} RENAME TO {new};"
+            )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         vendor = schema_editor.connection.vendor
-        for old, new in zip(["certego_saas_user", "certego_saas_user_groups", "certego_saas_user_user_permissions"],
-                            ["certego_saas_user_user", "certego_saas_user_user_groups",
-                             "certego_saas_user_user_user_permissions"]):
-            schema_editor.execute(f"ALTER TABLE {'IF EXISTS' if vendor == 'postgresql' else ''} {new} RENAME TO {old};")
+        for old, new in zip(
+            [
+                "certego_saas_user",
+                "certego_saas_user_groups",
+                "certego_saas_user_user_permissions",
+            ],
+            [
+                "certego_saas_user_user",
+                "certego_saas_user_user_groups",
+                "certego_saas_user_user_user_permissions",
+            ],
+        ):
+            schema_editor.execute(
+                f"ALTER TABLE {'IF EXISTS' if vendor == 'postgresql' else ''} {new} RENAME TO {old};"
+            )
 
     def describe(self):
         return "Alter Certego_saas_user table if necessary"
@@ -34,6 +56,4 @@ class Migration(migrations.Migration):
         ("certego_saas_user", "0001_initial"),
     ]
 
-    operations = [
-        AlterCertegoSaasUser()
-    ]
+    operations = [AlterCertegoSaasUser()]

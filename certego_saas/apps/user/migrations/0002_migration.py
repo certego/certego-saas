@@ -1,35 +1,39 @@
 from django.db import migrations
 
+from django.db.migrations.operations.base import Operation
+
+
+class AlterCertegoSaasUser(Operation):
+    reversible = True
+
+    def state_forwards(self, app_label, state):
+        pass
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        vendor = schema_editor.connection.vendor
+
+        for old, new in zip(["certego_saas_user", "certego_saas_user_groups", "certego_saas_user_user_permissions"],
+                            ["certego_saas_user_user", "certego_saas_user_user_groups",
+                             "certego_saas_user_user_user_permissions"]):
+
+            schema_editor.execute(f"ALTER TABLE {'IF EXISTS' if vendor == 'postgresql' else ''} {old} RENAME TO {new};")
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        vendor = schema_editor.connection.vendor
+        for old, new in zip(["certego_saas_user", "certego_saas_user_groups", "certego_saas_user_user_permissions"],
+                            ["certego_saas_user_user", "certego_saas_user_user_groups",
+                             "certego_saas_user_user_user_permissions"]):
+            schema_editor.execute(f"ALTER TABLE {'IF EXISTS' if vendor == 'postgresql' else ''} {new} RENAME TO {old};")
+
+    def describe(self):
+        return "Alter Certego_saas_user table if necessary"
+
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("certego_saas_user", "0001_initial"),
     ]
 
     operations = [
-        migrations.RunSQL(
-            sql=[
-                "ALTER TABLE IF EXISTS certego_saas_user RENAME TO certego_saas_user_user;"
-            ],
-            reverse_sql=[
-                "ALTER TABLE IF EXISTS certego_saas_user_user RENAME TO certego_saas_user;"
-            ],
-        ),
-        migrations.RunSQL(
-            sql=[
-                "ALTER TABLE IF EXISTS certego_saas_user_groups RENAME TO certego_saas_user_user_groups;"
-            ],
-            reverse_sql=[
-                "ALTER TABLE IF EXISTS certego_saas_user_user_groups RENAME TO certego_saas_user_groups;"
-            ],
-        ),
-        migrations.RunSQL(
-            sql=[
-                "ALTER TABLE IF EXISTS certego_saas_user_user_permissions RENAME TO certego_saas_user_user_user_permissions;"
-            ],
-            reverse_sql=[
-                "ALTER TABLE IF EXISTS certego_saas_user_user_user_permissions RENAME TO certego_saas_user_user_permissions;"
-            ],
-        ),
+        AlterCertegoSaasUser()
     ]

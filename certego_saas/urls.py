@@ -1,7 +1,11 @@
+# Patterns
+from django.apps import apps
 from django.urls import include, path
 
-# Patterns
-urlpatterns = [
+urlpatterns = []
+
+if apps.is_installed("certego_saas.apps.user"):
     # certego_saas: user sub-app
-    path("", include("certego_saas.user.urls")),
-]
+    urlpatterns.append(
+        path("", include("certego_saas.apps.user.urls")),
+    )

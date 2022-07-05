@@ -1,8 +1,8 @@
 from rest_flex_fields.serializers import FlexFieldsModelSerializer
 from rest_framework import serializers as rfs
 
-from certego_saas.user.models import User
-from certego_saas.user.serializers import UserSerializer
+from certego_saas.apps.user.models import User
+from certego_saas.apps.user.serializers import UserSerializer
 
 from .invitation import Invitation
 from .membership import Membership

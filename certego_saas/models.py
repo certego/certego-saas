@@ -1,9 +1,18 @@
 # flake8: noqa
 from django.apps import apps
 
-from .user.models import User
+__all__ = []
 
-__all__ = ["User"]
+if apps.is_installed("certego_saas.apps.user"):
+    from .apps.user.models import User
+
+    __all__ += ["User"]
+
+
+if apps.is_installed("certego_saas.apps.notifications"):
+    from .apps.notifications.models import Notification
+
+    __all__ += ["Notification"]
 
 if apps.is_installed("certego_saas.apps.organization"):
     # import these models only if organization app is installed,

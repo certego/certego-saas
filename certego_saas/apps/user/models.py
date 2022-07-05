@@ -32,7 +32,6 @@ class AbstractUser(DjangoAbstractUser):
 
     class Meta:
         abstract = True
-        app_label = "certego_saas"
 
     # utils
 
@@ -87,9 +86,6 @@ if apps.is_installed("certego_saas.apps.payments"):
     from certego_saas.apps.payments.models import Customer, Subscription
 
     class User(AbstractUser):
-        class Meta:
-            app_label = "certego_saas"
-
         def has_customer(self) -> bool:
             return hasattr(self, "customer") and self.customer is not None
 
@@ -155,5 +151,4 @@ if apps.is_installed("certego_saas.apps.payments"):
 else:
 
     class User(AbstractUser):  # type: ignore
-        class Meta:
-            app_label = "certego_saas"
+        pass

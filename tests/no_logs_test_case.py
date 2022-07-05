@@ -15,8 +15,9 @@ class NoLogsTestCase(unittest.TestCase):
         try:
             with self.assertLogs(logger=logger, level=level) as new_log:
                 yield
-        except AssertionError:
-            pass
+        except AssertionError as e:
+            if not e.args[0].startswith("no logs of level"):
+                raise e
         else:
             for record in new_log.records:
                 if record.levelno >= level:

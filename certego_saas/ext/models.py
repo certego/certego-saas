@@ -12,7 +12,7 @@ except ImportError:
 from .managers import AppSpecificModelManager, ToggleableModelManager
 
 
-class AppChoices(enum.Enum):
+class AppChoices(str, enum.Enum):
     ACCOUNTS = "ACCOUNTS"
     DRAGONFLY = "DRAGONFLY"
     INTELOWL = "INTELOWL"

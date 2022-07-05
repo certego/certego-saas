@@ -16,6 +16,8 @@ class AppChoices(enum.Enum):
     ACCOUNTS = "ACCOUNTS"
     DRAGONFLY = "DRAGONFLY"
     INTELOWL = "INTELOWL"
+    QUOKKA_PUBLIC = "QUOKKA_PUBLIC"
+
 
     @classproperty
     def CURRENTAPP(cls) -> str:

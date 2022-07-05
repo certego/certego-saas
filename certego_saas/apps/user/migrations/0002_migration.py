@@ -9,12 +9,15 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            "ALTER TABLE IF EXISTS certego_saas_user RENAME TO certego_saas_user_user",
+            sql=["ALTER TABLE IF EXISTS certego_saas_user RENAME TO certego_saas_user_user;"],
+            reverse_sql=["ALTER TABLE IF EXISTS certego_saas_user_user RENAME TO certego_saas_user;"],
         ),
         migrations.RunSQL(
-            "ALTER TABLE IF EXISTS certego_saas_user_groups RENAME TO certego_saas_user_user_groups",
+            sql=["ALTER TABLE IF EXISTS certego_saas_user_groups RENAME TO certego_saas_user_user_groups;"],
+            reverse_sql=["ALTER TABLE IF EXISTS certego_saas_user_user_groups RENAME TO certego_saas_user_groups;"],
         ),
         migrations.RunSQL(
-            "ALTER TABLE IF EXISTS certego_saas_user_user_permissions RENAME TO certego_saas_user_user_user_permissions",
+            sql=["ALTER TABLE IF EXISTS certego_saas_user_user_permissions RENAME TO certego_saas_user_user_user_permissions;"],
+            reverse_sql=["ALTER TABLE IF EXISTS certego_saas_user_user_user_permissions RENAME TO certego_saas_user_user_permissions;"],
         ),
     ]

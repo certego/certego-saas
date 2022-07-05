@@ -32,7 +32,6 @@ class AbstractUser(DjangoAbstractUser):
 
     class Meta:
         abstract = True
-        app_label = "certego_saas"
 
     # utils
 

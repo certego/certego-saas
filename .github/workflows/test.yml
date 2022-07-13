@@ -1,91 +1,53 @@
-name: Lint & Tests
+name: Certego Django CI
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
+
+# discard previous execution if you commit to a branch that is already running
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    env:
-      DJANGO_SETTINGS_MODULE: example_project.settings
-      PYLINT_MIN_SCORE: 9.20
-      PYLINT_DIRECTORIES: certego_saas example_project
-      FLAKE_DIRECTORIES: .
-      BLACK_DIRECTORIES: .
-      ISORT_DIRECTORIES: .
-      MYPY_DIRECTORIES: certego_saas example_project
+  detect-changes:
+    uses: certego/.github/.github/workflows/detect_changes.yml@0.2.0
+    with:
+        backend_directories: certego_saas, tests, example_project
 
-    steps:
-      - uses: actions/checkout@v2
+  python_linters:
+    if: ${{ needs.detect-changes.outputs.backend > 0 }}
+    needs: detect-changes
+    uses: certego/.github/.github/workflows/python_linter.yml@0.2.0
+    with:
+      working_directory: .
+      use_black: true
+      use_isort: true
+      use_flake8: true
+      use_pylint: false
+      use_bandit: false
+      python_versions: >-
+        [ "3.7", "3.8", "3.9"]
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
+  python_tests:
+    if: ${{ needs.detect-changes.outputs.backend > 0 }}
+    needs: [detect-changes, python_linters ]
+    uses: certego/.github/.github/workflows/python_tests.yml@0.2.0
+    with:
+      working_directory: .
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .[dev]
+      requirements_path: ./requirements.txt
 
-      - name: "Lint: flake8"
-        run: |
-          flake8 ${FLAKE_DIRECTORIES} --config=.flake8 --show-source
+      django_settings_module: example_project.settings
 
-      - name: "Lint: black formatter"
-        run: |
-          black ${BLACK_DIRECTORIES} --check --diff
+      check_migrations: true
+      check_requirements_licenses: false
 
-      - name: "Lint: isort"
-        run: |
-          isort ${ISORT_DIRECTORIES} --profile black --filter-files --check-only --diff --skip venv
+      use_coverage: true
+      upload_coverage: true
+      python_versions: >-
+        [ "3.7", "3.8", "3.9"]
+     
 
-      - name: "Lint: pylint"
-        run: |
-          pylint ${PYLINT_DIRECTORIES} --exit-zero > output.txt
-          cat output.txt
-          SCORE=$(tail -2 output.txt | head -1 | grep -Po "\d+(\.\d*)?|\.\d+" | head -1)
-          echo $SCORE
-          echo $PYLINT_MIN_SCORE
-          RES=$( echo $SCORE'<'$PYLINT_MIN_SCORE | bc -l) #if score greater equal pylint_min_score then res=0 else res=1
-          echo $RES
-          exit $RES
-        shell: bash
-
-      - name: "Type checking: mypy"
-        run: |
-          mypy ${MYPY_DIRECTORIES}
-        shell: bash
-
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        python-version: ["3.8", "3.9", "3.10"]
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .[dev]
-
-      - name: "Test: tests.*"
-        timeout-minutes: 5
-        run: |
-          # run tests with coverage
-          tox
-        env:
-          STRIPE_TEST_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1

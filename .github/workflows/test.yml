@@ -49,5 +49,9 @@ jobs:
       upload_coverage: true
       python_versions: >-
         [ "3.8", "3.9", "3.10"]
-     
+      env: >-
+        {
+        "STRIPE_TEST_SECRET_KEY": "sk_test_123456789",
+        }
+        
 

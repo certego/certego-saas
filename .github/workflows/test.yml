@@ -18,7 +18,7 @@ jobs:
         backend_directories: certego_saas, tests, example_project
 
   python_linters:
-    if: ${{ needs.detect-changes.outputs.backend > 0 }}
+#    if: ${{ needs.detect-changes.outputs.backend > 0 }}
     needs: detect-changes
     uses: certego/.github/.github/workflows/python_linter.yml@0.2.0
     with:
@@ -32,7 +32,7 @@ jobs:
         [ "3.7", "3.8", "3.9"]
 
   python_tests:
-    if: ${{ needs.detect-changes.outputs.backend > 0 }}
+#    if: ${{ needs.detect-changes.outputs.backend > 0 }}
     needs: [detect-changes, python_linters ]
     uses: certego/.github/.github/workflows/python_tests.yml@0.2.0
     with:

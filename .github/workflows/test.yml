@@ -51,7 +51,7 @@ jobs:
         [ "3.8", "3.9", "3.10"]
       env: >-
         {
-        "STRIPE_TEST_SECRET_KEY": ${{ secrets.STRIPE_TEST_SECRET_KEY }},
+        "STRIPE_TEST_SECRET_KEY": ${{ secret.STRIPE_TEST_SECRET_KEY }},
         }
         
 

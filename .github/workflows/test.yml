@@ -49,6 +49,9 @@ jobs:
       upload_coverage: true
       python_versions: >-
         [ "3.8", "3.9", "3.10"]
-    secrets: inherit
+      env: >-
+        {
+        "STRIPE_TEST_SECRET_KEY": ${{ secrets.STRIPE_TEST_SECRET_KEY }},
+        }
         
 

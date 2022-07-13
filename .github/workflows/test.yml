@@ -29,7 +29,7 @@ jobs:
       use_pylint: false
       use_bandit: false
       python_versions: >-
-        [ "3.7", "3.8", "3.9"]
+        [ "3.8", "3.9", "3.10"]
 
   python_tests:
 #    if: ${{ needs.detect-changes.outputs.backend > 0 }}
@@ -48,6 +48,6 @@ jobs:
       use_coverage: true
       upload_coverage: true
       python_versions: >-
-        [ "3.7", "3.8", "3.9"]
+        [ "3.8", "3.9", "3.10"]
      
 

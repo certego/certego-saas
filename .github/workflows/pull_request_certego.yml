@@ -13,32 +13,24 @@ concurrency:
 
 jobs:
   detect-changes:
-    uses: certego/.github/.github/workflows/detect_changes.yml@0.2.1
+    uses: certego/.github/.github/workflows/detect_changes.yml@0.3.3
     with:
         backend_directories: certego_saas, tests, example_project
 
-  python_linters:
+  python_tests:
     if: ${{ needs.detect-changes.outputs.backend > 0 }}
     needs: detect-changes
-    uses: certego/.github/.github/workflows/python_linter.yml@0.2.1
+    uses: certego/.github/.github/workflows/python.yml@0.3.3
     with:
       working_directory: .
+
       use_black: true
       use_isort: true
       use_flake8: true
       use_pylint: false
       use_bandit: false
-      python_versions: >-
-        [ "3.8", "3.9", "3.10"]
 
-  python_tests:
-    if: ${{ needs.detect-changes.outputs.backend > 0 }}
-    needs: [detect-changes, python_linters ]
-    uses: certego/.github/.github/workflows/python_tests.yml@0.2.1
-    with:
-      working_directory: .
-
-      requirements_path: ./requirements.txt
+      requirements_path: requirements.txt
 
       django_settings_module: example_project.settings
 

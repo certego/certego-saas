@@ -18,7 +18,7 @@ jobs:
         backend_directories: certego_saas, tests, example_project
 
   python_tests:
-    if: ${{ needs.detect-changes.outputs.backend > 0 }}
+#    if: ${{ needs.detect-changes.outputs.backend > 0 }}
     needs: detect-changes
     uses: certego/.github/.github/workflows/python.yml@0.3.3
     with:

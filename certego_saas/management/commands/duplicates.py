@@ -87,4 +87,4 @@ class Command(BaseCommand):
                             f"You would have deleted {count} objects {to_delete} with field {field} having value {_id}"
                         )
                     )
-            self.stdout.write(self.style.SUCCESS(f"The end"))
+            self.stdout.write(self.style.SUCCESS("The end"))

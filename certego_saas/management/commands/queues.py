@@ -1,16 +1,19 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+
 class Command(BaseCommand):
     help = "Queue management"
 
     def add_arguments(self, parser):
-        parser.add_argument("job", type=str, help="What to do", choices=["list_messages", "purge"])
+        parser.add_argument(
+            "job", type=str, help="What to do", choices=["list_messages", "purge"]
+        )
         parser.add_argument("-p", "--prefix", type=str, help="Prefix of the queues")
 
     def _dynamic_import(self):
         try:
-            import boto3
+            pass
         except ImportError:
             self.stdout.write(
                 self.style.ERROR(
@@ -24,9 +27,7 @@ class Command(BaseCommand):
     def _purge(self, client, queue):
         client.purge_queue(QueueUrl=queue)
         self.stdout.write(
-            self.style.SUCCESS(
-                f"Successfully purged queue {queue} with url {queue}"
-            )
+            self.style.SUCCESS(f"Successfully purged queue {queue} with url {queue}")
         )
 
     def _list_messages(self, client, queue):
@@ -34,9 +35,7 @@ class Command(BaseCommand):
             QueueUrl=queue,
             AttributeNames=["ApproximateNumberOfMessages"],
         )
-        message_in_the_queue = queue_data["Attributes"][
-            "ApproximateNumberOfMessages"
-        ]
+        message_in_the_queue = queue_data["Attributes"]["ApproximateNumberOfMessages"]
         self.stdout.write(
             self.style.SUCCESS(
                 f"The number of the messages in the queue {queue} is {message_in_the_queue}"
@@ -56,13 +55,13 @@ class Command(BaseCommand):
         else:
             queues = client.list_queues()
         queues = queues.get("QueueUrls", [])
-        dispatcher = {
-            "purge": self._purge,
-            "list_messages": self._list_messages
-        }
+        dispatcher = {"purge": self._purge, "list_messages": self._list_messages}
         job = options["job"]
         for queue in queues:
-            if input(f"Are you sure you want to do {job} on queue {queue}? (y/n) ") == "y":
+            if (
+                input(f"Are you sure you want to do {job} on queue {queue}? (y/n) ")
+                == "y"
+            ):
                 try:
                     dispatcher[job](client, queue)
                 except Exception as e:

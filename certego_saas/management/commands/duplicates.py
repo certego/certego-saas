@@ -39,6 +39,7 @@ class Command(BaseCommand):
         # since we are not adding this in the requirements.txt file
         pmp: str = options["python_model_path"]
         import importlib
+
         order_by_field = options["order_by"]
         module, klass = pmp.rsplit(".", maxsplit=1)
         module = importlib.import_module(module)
@@ -54,7 +55,13 @@ class Command(BaseCommand):
             groups = model_class.objects.aggregate(
                 [
                     {"$project": {f"{field}": 1, "_id": 1}},
-                    {"$group": {"_id": f"${field}", "count": {"$sum": 1}, "ids": {"$push": "$_id"}}},
+                    {
+                        "$group": {
+                            "_id": f"${field}",
+                            "count": {"$sum": 1},
+                            "ids": {"$push": "$_id"},
+                        }
+                    },
                     {"$match": {"_id": {"$ne": None}, "count": {"$gt": 1}}},
                 ]
             )
@@ -64,16 +71,20 @@ class Command(BaseCommand):
             for group in groups:
                 _id = group["_id"]
                 to_delete = model_class.objects.filter(id__in=group["ids"]).order_by(
-                        order_by_field
-                    )[1:]
+                    order_by_field
+                )[1:]
                 if dry_run:
                     to_delete = to_delete.values_list("pk")
-                    self.stdout.write(self.style.SUCCESS(f"You would have deleted {len(to_delete)} objects {to_delete} with field {field} having value {_id}"))
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"You would have deleted {len(to_delete)} objects {to_delete} with field {field} having value {_id}"
+                        )
+                    )
                 else:
                     count = to_delete.delete()
-                    self.stdout.write(self.style.SUCCESS(f"You would have deleted {count} objects {to_delete} with field {field} having value {_id}"))
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"The end"
-                )
-            )
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f"You would have deleted {count} objects {to_delete} with field {field} having value {_id}"
+                        )
+                    )
+            self.stdout.write(self.style.SUCCESS(f"The end"))

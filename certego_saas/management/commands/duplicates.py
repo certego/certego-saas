@@ -84,7 +84,7 @@ class Command(BaseCommand):
                     count = to_delete.delete()
                     self.stdout.write(
                         self.style.SUCCESS(
-                            f"You would have deleted {count} objects {to_delete} with field {field} having value {_id}"
+                            f"You have deleted {count} objects {to_delete} with field {field} having value {_id}"
                         )
                     )
             self.stdout.write(self.style.SUCCESS("The end"))

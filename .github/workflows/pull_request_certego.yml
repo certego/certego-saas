@@ -1,0 +1,46 @@
+name: Certego Django CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+# discard previous execution if you commit to a branch that is already running
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect-changes:
+    uses: certego/.github/.github/workflows/detect_changes.yml@0.3.4
+    with:
+        backend_directories: certego_saas tests example_project
+
+  python_tests:
+    if: ${{ needs.detect-changes.outputs.backend > 0 }}
+    needs: detect-changes
+    uses: certego/.github/.github/workflows/python.yml@0.3.4
+    with:
+      working_directory: .
+
+      use_black: true
+      use_isort: true
+      use_flake8: true
+      use_pylint: false
+      use_bandit: false
+
+      requirements_path: requirements.txt
+
+      django_settings_module: example_project.settings
+
+      check_migrations: true
+      check_requirements_licenses: false
+
+      use_coverage: true
+      upload_coverage: true
+      python_versions: >-
+        [ "3.8", "3.9", "3.10"]
+    secrets: inherit
+        
+

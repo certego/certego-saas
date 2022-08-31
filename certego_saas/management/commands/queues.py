@@ -13,16 +13,15 @@ class Command(BaseCommand):
 
     def _dynamic_import(self):
         try:
-            pass
-        except ImportError:
+            import boto3
+            self.client = boto3.client("sqs", settings.AWS_REGION)
+        except ImportError as e:
             self.stdout.write(
                 self.style.ERROR(
                     "boto3 is not installed. Please install boto3 to use this command."
                 )
             )
-            return False
-        else:
-            return True
+            raise e
 
     def _purge(self, client, queue):
         client.purge_queue(QueueUrl=queue)
@@ -47,13 +46,12 @@ class Command(BaseCommand):
         # since we are not adding this in the requirements.txt file
         if not self._dynamic_import():
             return
-        client = boto3.client("sqs", settings.AWS_REGION)
 
         prefix = options.get("prefix")
         if prefix:
-            queues = client.list_queues(QueueNamePrefix=prefix)
+            queues = self.client.list_queues(QueueNamePrefix=prefix)
         else:
-            queues = client.list_queues()
+            queues = self.client.list_queues()
         queues = queues.get("QueueUrls", [])
         dispatcher = {"purge": self._purge, "list_messages": self._list_messages}
         job = options["job"]
@@ -63,7 +61,7 @@ class Command(BaseCommand):
                 == "y"
             ):
                 try:
-                    dispatcher[job](client, queue)
+                    dispatcher[job](self.client, queue)
                 except Exception as e:
                     self.stdout.write(self.style.ERROR(f"Error {e}"))
             else:

@@ -89,7 +89,7 @@ class Command(BaseCommand):
                 == "y"
             ):
                 try:
-                    dispatcher[mode](queue, **mode)
+                    dispatcher[mode](queue, **options)
                 except Exception as e:
                     self.stdout.write(self.style.ERROR(f"Error {e}"))
             else:

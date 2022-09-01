@@ -76,7 +76,7 @@ class Command(BaseCommand):
         queues = queues.get("QueueUrls", [])
 
         if not queues:
-            self.stdout.write(self.style.ERROR(f"No Queues"))
+            self.stdout.write(self.style.ERROR("No Queues"))
         dispatcher = {
             "purge": self._purge,
             "count_messages": self._count_messages,

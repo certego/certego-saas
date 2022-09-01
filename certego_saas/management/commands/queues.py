@@ -6,15 +6,24 @@ class Command(BaseCommand):
     help = "Queue management"
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "job", type=str, help="What to do", choices=["list_messages", "purge"]
-        )
         parser.add_argument("-p", "--prefix", type=str, help="Prefix of the queues")
+
+        subparsers = parser.add_subparsers(
+            help="Queues commands", dest="mode"
+        )
+        subparsers.add_parser("purge", help="Purge a queue")
+        subparsers.add_parser("count_messages", help="Count messages of a queue")
+        parser_a = subparsers.add_parser("show_messages", help="Show messages ofa  queue")
+        parser_a.add_argument(
+            "-c",
+            "--count",
+            type=int,
+            help="How many messages to show",
+        )
 
     def _dynamic_import(self):
         try:
             import boto3
-            self.client = boto3.client("sqs", settings.AWS_REGION)
         except ImportError as e:
             self.stdout.write(
                 self.style.ERROR(
@@ -22,15 +31,17 @@ class Command(BaseCommand):
                 )
             )
             raise e
+        else:
+            self.client = boto3.client("sqs", settings.AWS_REGION)
 
-    def _purge(self, client, queue):
-        client.purge_queue(QueueUrl=queue)
+    def _purge(self, queue, **kwargs):
+        self.client.purge_queue(QueueUrl=queue)
         self.stdout.write(
             self.style.SUCCESS(f"Successfully purged queue {queue} with url {queue}")
         )
 
-    def _list_messages(self, client, queue):
-        queue_data = client.get_queue_attributes(
+    def _count_messages(self, queue, **kwargs):
+        queue_data = self.client.get_queue_attributes(
             QueueUrl=queue,
             AttributeNames=["ApproximateNumberOfMessages"],
         )
@@ -41,27 +52,44 @@ class Command(BaseCommand):
             )
         )
 
+    def _show_messages(self, queue, count=100, **kwargs):
+
+        for i, message in enumerate(self.client.receive_message(QueueUrl=queue, MaxNumberOfMessages=count, VisibilityTimeout=10)):
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"Message {i} has content {message.body}"
+                )
+            )
+
+
     def handle(self, *args, **options):
         # we should import it here so that projects that don't use boto3 can still use this library
         # since we are not adding this in the requirements.txt file
-        if not self._dynamic_import():
-            return
+        self._dynamic_import()
 
-        prefix = options.get("prefix")
+        prefix = options.pop("prefix")
         if prefix:
             queues = self.client.list_queues(QueueNamePrefix=prefix)
         else:
             queues = self.client.list_queues()
         queues = queues.get("QueueUrls", [])
-        dispatcher = {"purge": self._purge, "list_messages": self._list_messages}
-        job = options["job"]
+
+        if not queues:
+            self.stdout.write(
+                self.style.ERROR(
+                    f"No Queues"
+                )
+            )
+        dispatcher = {"purge": self._purge, "count_messages": self._count_messages,
+                      "show_messages": self._show_messages}
+        mode = options.pop("mode")
         for queue in queues:
             if (
-                input(f"Are you sure you want to do {job} on queue {queue}? (y/n) ")
+                input(f"Are you sure you want to do {mode} on queue {queue}? (y/n) ")
                 == "y"
             ):
                 try:
-                    dispatcher[job](self.client, queue)
+                    dispatcher[mode](queue, **mode)
                 except Exception as e:
                     self.stdout.write(self.style.ERROR(f"Error {e}"))
             else:

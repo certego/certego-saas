@@ -8,12 +8,12 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("-p", "--prefix", type=str, help="Prefix of the queues")
 
-        subparsers = parser.add_subparsers(
-            help="Queues commands", dest="mode"
-        )
+        subparsers = parser.add_subparsers(help="Queues commands", dest="mode")
         subparsers.add_parser("purge", help="Purge a queue")
         subparsers.add_parser("count_messages", help="Count messages of a queue")
-        parser_a = subparsers.add_parser("show_messages", help="Show messages ofa  queue")
+        parser_a = subparsers.add_parser(
+            "show_messages", help="Show messages ofa  queue"
+        )
         parser_a.add_argument(
             "-c",
             "--count",
@@ -54,13 +54,14 @@ class Command(BaseCommand):
 
     def _show_messages(self, queue, count=100, **kwargs):
 
-        for i, message in enumerate(self.client.receive_message(QueueUrl=queue, MaxNumberOfMessages=count, VisibilityTimeout=10)):
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"Message {i} has content {message.body}"
-                )
+        for i, message in enumerate(
+            self.client.receive_message(
+                QueueUrl=queue, MaxNumberOfMessages=count, VisibilityTimeout=10
             )
-
+        ):
+            self.stdout.write(
+                self.style.SUCCESS(f"Message {i} has content {message.body}")
+            )
 
     def handle(self, *args, **options):
         # we should import it here so that projects that don't use boto3 can still use this library
@@ -75,13 +76,12 @@ class Command(BaseCommand):
         queues = queues.get("QueueUrls", [])
 
         if not queues:
-            self.stdout.write(
-                self.style.ERROR(
-                    f"No Queues"
-                )
-            )
-        dispatcher = {"purge": self._purge, "count_messages": self._count_messages,
-                      "show_messages": self._show_messages}
+            self.stdout.write(self.style.ERROR(f"No Queues"))
+        dispatcher = {
+            "purge": self._purge,
+            "count_messages": self._count_messages,
+            "show_messages": self._show_messages,
+        }
         mode = options.pop("mode")
         for queue in queues:
             if (

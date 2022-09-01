@@ -59,7 +59,6 @@ class Command(BaseCommand):
                         "$group": {
                             "_id": f"${field}",
                             "count": {"$sum": 1},
-                            "ids": {"$push": "$_id"},
                         }
                     },
                     {"$match": {"_id": {"$ne": None}, "count": {"$gt": 1}}},

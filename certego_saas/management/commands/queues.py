@@ -45,7 +45,7 @@ class Command(BaseCommand):
             QueueUrl=queue,
             AttributeNames=["ApproximateNumberOfMessages"],
         )
-        message_in_the_queue = queue_data["Attributes"]["ApproximateNumberOfMessages"]
+        message_in_the_queue = int(queue_data["Attributes"]["ApproximateNumberOfMessages"])
         if not message_in_the_queue:
             style = self.style.ERROR
         else:

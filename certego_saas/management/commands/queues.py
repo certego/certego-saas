@@ -46,21 +46,31 @@ class Command(BaseCommand):
             AttributeNames=["ApproximateNumberOfMessages"],
         )
         message_in_the_queue = queue_data["Attributes"]["ApproximateNumberOfMessages"]
+        if not message_in_the_queue:
+            style = self.style.ERROR
+        else:
+            style = self.style.SUCCESS
         self.stdout.write(
-            self.style.SUCCESS(
+            style(
                 f"The number of the messages in the queue {queue} is {message_in_the_queue}"
             )
         )
 
     def _show_messages(self, queue, count=100, **kwargs):
-
-        for i, message in enumerate(
-            self.client.receive_message(
+        messages = self.client.receive_message(
                 QueueUrl=queue, MaxNumberOfMessages=count, VisibilityTimeout=10
+            ).get("Messages", [])
+        if not messages:
+            self.stdout.write(
+                self.style.ERROR(
+                    f"No messages available for queue {queue}"
+                )
             )
+        for i, message in enumerate(
+            messages
         ):
             self.stdout.write(
-                self.style.SUCCESS(f"Message {i} has content {message.body}")
+                self.style.SUCCESS(f"Message {i} has content {message['Body']}")
             )
 
     def handle(self, *args, **options):

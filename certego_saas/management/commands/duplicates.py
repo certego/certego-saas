@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.management.base import BaseCommand
 
 
@@ -27,6 +29,19 @@ class Command(BaseCommand):
             default="mongo",
         )
         parser.add_argument(
+            "-f",
+            "--from",
+            type=str,
+            help="From date format DD/MM/YYYY",
+        )
+        parser.add_argument(
+            "-t",
+            "--to",
+            type=str,
+            help="From date format DD/MM/YY",
+        )
+
+        parser.add_argument(
             "-e",
             "--execute",
             action="store_true",
@@ -52,9 +67,28 @@ class Command(BaseCommand):
             raise NotImplementedError("Postgres has not been implement now")
         else:
             field = options["unique_field"]
-            groups = model_class.objects.aggregate(
+            if hasattr(model_class ,"atlas"):
+                qs = getattr(model_class, "atlas")
+            else:
+                qs = getattr(model_class, "objects")
+            _from = options.get("from", None)
+            _from = datetime.datetime.strptime(_from, "%d%m%Y")
+            if _from:
+                qs = qs.filter(
+                    **{f"{field}__gte":
+                _from}
+                )
+            _to = options.get("to", None)
+            _to = datetime.datetime.strptime(_to, "%d%m%Y")
+            if _to:
+                qs = qs.filter(
+                    **{f"{field}__lte":
+                           _to}
+                )
+
+            groups = qs.aggregate(
                 [
-                    {"$project": {f"{field}": 1, "_id": 1}},
+                    {"$project": {field: 1, "_id": 1, order_by_field: 1}},
                     {
                         "$group": {
                             "_id": f"${field}",
@@ -76,7 +110,8 @@ class Command(BaseCommand):
                     to_delete = to_delete.values_list("pk")
                     self.stdout.write(
                         self.style.SUCCESS(
-                            f"You would have deleted {len(to_delete)} objects {to_delete} with field {field} having value {_id}"
+                            f"You would have deleted {len(to_delete)} objects {to_delete} with field {field} having "
+                            f"value {_id}"
                         )
                     )
                 else:

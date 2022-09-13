@@ -4,7 +4,6 @@ import datetime
 from django.core.management import BaseCommand
 from django.utils import timezone
 
-
 # DATA EXAMPLE
 # {'celery@worker_analyze': [],
 #  'celery@worker_customers': [],
@@ -47,12 +46,15 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "app", type=str, help="App celery control python path"
+            "app",
+            type=str,
+            help="App celery control python path (Ex: intelowl.celery.app = <app_folder>.<celery_module>.<celery_app_name>)",
         )
 
     def handle(self, *args, **options):
         import importlib
-        app_python_path=options["app"]
+
+        app_python_path = options["app"]
         module, obj = app_python_path.rsplit(".", maxsplit=1)
         module = importlib.import_module(module)
         app = getattr(module, obj)

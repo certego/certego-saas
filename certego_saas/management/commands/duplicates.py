@@ -40,13 +40,25 @@ class Command(BaseCommand):
             type=str,
             help="From date format DD/MM/YY",
         )
-
+        parser.add_argument(
+            "-df",
+            "--date_field",
+            type=str,
+            help="Use this field to filter objects based on to/from"
+        )
         parser.add_argument(
             "-e",
             "--execute",
             action="store_true",
             help="Do not actually delete the object",
             default=False,
+        )
+        parser.add_argument(
+            "-a",
+            "--atlas",
+            action="store_true",
+            help="Use atlas for the query",
+            default=False
         )
 
     def handle(self, *args, **options):
@@ -67,24 +79,32 @@ class Command(BaseCommand):
             raise NotImplementedError("Postgres has not been implement now")
         else:
             field = options["unique_field"]
-            if hasattr(model_class ,"atlas"):
-                qs = getattr(model_class, "atlas")
+            if options["atlas"]:
+                if hasattr(model_class,"atlas"):
+                    qs = getattr(model_class, "atlas")
+                else:
+                    raise ValueError(f"Class {pmp} does not have an atlas object")
             else:
                 qs = getattr(model_class, "objects")
+
+            date_field = options.get("date_field",order_by_field )
+
             _from = options.get("from", None)
-            _from = datetime.datetime.strptime(_from, "%d%m%Y")
+            _from = datetime.datetime.strptime(_from, "%d/%m/%Y")
             if _from:
                 qs = qs.filter(
-                    **{f"{field}__gte":
+                    **{f"{date_field}__gte":
                 _from}
                 )
             _to = options.get("to", None)
-            _to = datetime.datetime.strptime(_to, "%d%m%Y")
+            _to = datetime.datetime.strptime(_to, "%d/%m/%Y")
             if _to:
                 qs = qs.filter(
-                    **{f"{field}__lte":
+                    **{f"{date_field}__lte":
                            _to}
                 )
+            if _from or _to:
+                print(f"Using {date_field} to filter research")
 
             groups = qs.aggregate(
                 [
@@ -104,7 +124,7 @@ class Command(BaseCommand):
             for group in groups:
                 _id = group["_id"]
                 to_delete = model_class.objects.filter(id__in=group["ids"]).order_by(
-                    order_by_field
+                    f"-{order_by_field}"
                 )[1:]
                 if dry_run:
                     to_delete = to_delete.values_list("pk")

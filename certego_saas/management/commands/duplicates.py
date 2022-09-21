@@ -44,7 +44,7 @@ class Command(BaseCommand):
             "-df",
             "--date_field",
             type=str,
-            help="Use this field to filter objects based on to/from"
+            help="Use this field to filter objects based on to/from",
         )
         parser.add_argument(
             "-e",
@@ -58,7 +58,7 @@ class Command(BaseCommand):
             "--atlas",
             action="store_true",
             help="Use atlas for the query",
-            default=False
+            default=False,
         )
 
     def handle(self, *args, **options):
@@ -80,7 +80,7 @@ class Command(BaseCommand):
         else:
             field = options["unique_field"]
             if options["atlas"]:
-                if hasattr(model_class,"atlas"):
+                if hasattr(model_class, "atlas"):
                     qs = getattr(model_class, "atlas")
                 else:
                     raise ValueError(f"Class {pmp} does not have an atlas object")
@@ -92,17 +92,11 @@ class Command(BaseCommand):
             _from = options.get("from", None)
             _from = datetime.datetime.strptime(_from, "%d/%m/%Y")
             if _from:
-                qs = qs.filter(
-                    **{f"{date_field}__gte":
-                _from}
-                )
+                qs = qs.filter(**{f"{date_field}__gte": _from})
             _to = options.get("to", None)
             _to = datetime.datetime.strptime(_to, "%d/%m/%Y")
             if _to:
-                qs = qs.filter(
-                    **{f"{date_field}__lte":
-                           _to}
-                )
+                qs = qs.filter(**{f"{date_field}__lte": _to})
             if _from or _to:
                 print(f"Using {date_field} to filter research")
 

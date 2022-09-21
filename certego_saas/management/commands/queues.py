@@ -45,7 +45,9 @@ class Command(BaseCommand):
             QueueUrl=queue,
             AttributeNames=["ApproximateNumberOfMessages"],
         )
-        message_in_the_queue = int(queue_data["Attributes"]["ApproximateNumberOfMessages"])
+        message_in_the_queue = int(
+            queue_data["Attributes"]["ApproximateNumberOfMessages"]
+        )
         if not message_in_the_queue:
             style = self.style.ERROR
         else:
@@ -58,17 +60,13 @@ class Command(BaseCommand):
 
     def _show_messages(self, queue, count=100, **kwargs):
         messages = self.client.receive_message(
-                QueueUrl=queue, MaxNumberOfMessages=count, VisibilityTimeout=10
-            ).get("Messages", [])
+            QueueUrl=queue, MaxNumberOfMessages=count, VisibilityTimeout=10
+        ).get("Messages", [])
         if not messages:
             self.stdout.write(
-                self.style.ERROR(
-                    f"No messages available for queue {queue}"
-                )
+                self.style.ERROR(f"No messages available for queue {queue}")
             )
-        for i, message in enumerate(
-            messages
-        ):
+        for i, message in enumerate(messages):
             self.stdout.write(
                 self.style.SUCCESS(f"Message {i} has content {message['Body']}")
             )

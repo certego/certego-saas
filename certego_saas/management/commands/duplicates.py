@@ -87,7 +87,7 @@ class Command(BaseCommand):
             else:
                 qs = getattr(model_class, "objects")
 
-            date_field = options.get("date_field",order_by_field )
+            date_field = options.get("date_field", order_by_field)
 
             _from = options.get("from", None)
             _from = datetime.datetime.strptime(_from, "%d/%m/%Y")
@@ -123,7 +123,7 @@ class Command(BaseCommand):
 
             for group in groups:
                 _id = group["_id"]
-                to_delete = model_class.objects.filter(id__in=group["ids"]).order_by(
+                to_delete = model_class.objects.filter(**{field: _id}).order_by(
                     f"-{order_by_field}"
                 )[1:]
                 if dry_run:

@@ -121,7 +121,7 @@ class Command(BaseCommand):
                     f"-{order_by_field}"
                 )[1:]
                 if dry_run:
-                    to_delete = to_delete.values_list("pk")
+                    to_delete = to_delete.values_list("pk").copy()
                     self.stdout.write(
                         self.style.SUCCESS(
                             f"You would have deleted {len(to_delete)} objects {to_delete} with field {field} having "

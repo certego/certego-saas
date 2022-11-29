@@ -3,7 +3,7 @@ from typing import Tuple
 
 from rest_framework.test import APIClient, APITestCase
 
-from certego_saas.ext.test_utilities import NoLogsTestCase
+from certego_saas.ext.test_utilities.no_logs_test_case import NoLogsTestCase
 from certego_saas.models import User
 
 

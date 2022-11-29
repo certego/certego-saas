@@ -3,8 +3,8 @@ from typing import Tuple
 
 from rest_framework.test import APIClient, APITestCase
 
-from certego_saas.models import User
 from certego_saas.ext.test_utilities import NoLogsTestCase
+from certego_saas.models import User
 
 
 def setup() -> Tuple[APIClient, User]:

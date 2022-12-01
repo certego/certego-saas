@@ -6,6 +6,7 @@ __pycache__/
 venv/
 .vscode
 build/
+.idea
 
 # C extensions
 *.so

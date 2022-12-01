@@ -28,7 +28,8 @@ class NoLogsTestCase(unittest.TestCase):
             for record in new_log.records:
                 if self.override_local_max_logging_level is not None:
                     level = self.override_local_max_logging_level
-                if record.levelno >= level:
+                # we cannot use >= because this always make the branches with critical log fail
+                if record.levelno > level:
                     raise AssertionError(
                         f"Unexpected logging message: '{record.message}' with level {record.levelname}. Max level is {level}"
                     )

@@ -16,7 +16,6 @@ README = (HERE / "README.md").read_text()
 # Define requirements
 requirements = (REQUIREMENTS / "requirements.txt").read_text().split("\n")
 requirements_dev = (REQUIREMENTS / "requirements.dev.txt").read_text().split("\n")
-requirements_ext = (REQUIREMENTS / "requirements.ext.txt").read_text().split("\n")
 # read version
 version_contents = {}
 with open((HERE / "certego_saas" / "version.py"), encoding="utf-8") as f:
@@ -42,7 +41,7 @@ setup(
     include_package_data=True,
     packages=find_packages(),
     python_requires=">=3.8",
-    install_requires=requirements + requirements_ext,
+    install_requires=requirements,
     project_urls={
         "Documentation": GITHUB_URL,
         "Source": GITHUB_URL,
@@ -51,6 +50,5 @@ setup(
     keywords="certego django rest framework saas",
     extras_require={
         "dev": requirements + requirements_dev,
-        "ext": requirements_ext,
     },
 )

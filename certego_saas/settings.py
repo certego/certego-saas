@@ -39,33 +39,13 @@ DEFAULTS = {
     # third party keys
     "STRIPE_LIVE_MODE": STRIPE_LIVE_MODE,
     "STRIPE_WEBHOOK_SIGNING_KEY": get_secret("STRIPE_WEBHOOK_SIGNING_KEY", None),
+    "SLACK_TOKEN": get_secret("SLACK_TOKEN", None),
+    "SLACK_CHANNEL": get_secret("SLACK_CHANNEL", None),
+    "TWITTER_CONSUMER_KEY": get_secret("TWITTER_CONSUMER_KEY", None),
+    "TWITTER_CONSUMER_SECRET": get_secret("TWITTER_CONSUMER_SECRET", None),
+    "TWITTER_TOKEN_KEY": get_secret("TWITTER_TOKEN_KEY", None),
+    "TWITTER_TOKEN_SECRET": get_secret("TWITTER_TOKEN_SECRET", None),
 }
-try:
-    import twitter
-except ImportError:
-    pass
-else:
-    print("Twitter not installed")
-    DEFAULTS.update({
-        "TWITTER_CONSUMER_KEY": get_secret("TWITTER_CONSUMER_KEY", None),
-        "TWITTER_CONSUMER_SECRET": get_secret("TWITTER_CONSUMER_SECRET", None),
-        "TWITTER_TOKEN_KEY": get_secret("TWITTER_TOKEN_KEY", None),
-        "TWITTER_TOKEN_SECRET": get_secret("TWITTER_TOKEN_SECRET", None),
-    })
-try:
-    import slack_sdk
-except ImportError:
-    pass
-else:
-    print("Slack not installed")
-
-    DEFAULTS.update({
-        "SLACK_TOKEN": get_secret("SLACK_TOKEN", None),
-        "SLACK_CHANNEL": get_secret("SLACK_CHANNEL", None),
-
-    }
-
-    )
 
 IMPORT_STRINGS = ["USER_ACCESS_SERIALIZER"]
 

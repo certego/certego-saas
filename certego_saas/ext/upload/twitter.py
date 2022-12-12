@@ -95,4 +95,4 @@ class _Twitter(_TwitterInterface):
 
 
 #: Twitter Client
-Twitter = _FakeTwitter if settings.STAGE_LOCAL or settings.STAGE_CI else _Twitter
+Twitter = _FakeTwitter if settings.DEBUG else _Twitter

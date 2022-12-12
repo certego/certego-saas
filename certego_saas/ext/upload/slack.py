@@ -68,5 +68,5 @@ class _Slack(_SlackInterface):
 
 #: Slack Client
 Slack: Type[Union[_Slack, _FakeSlack]] = (
-    _FakeSlack if settings.STAGE_LOCAL or settings.STAGE_CI else _Slack
+    _FakeSlack if settings.DEBUG else _Slack
 )

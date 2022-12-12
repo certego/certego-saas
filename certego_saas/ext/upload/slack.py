@@ -26,7 +26,7 @@ class _SlackInterface(metaclass=abc.ABCMeta):
     ):
         pass
 
-if settings.DEBUG:
+if settings.DEBUG or settings.TESTING:
     class Slack(_SlackInterface):
         def send_message(
             self, title: str, body: str = "", urgent: bool = False, channel=None

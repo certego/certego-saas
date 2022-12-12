@@ -45,6 +45,7 @@ try:
 except ImportError:
     pass
 else:
+    print("Twitter not installed")
     DEFAULTS.update({
         "TWITTER_CONSUMER_KEY": get_secret("TWITTER_CONSUMER_KEY", None),
         "TWITTER_CONSUMER_SECRET": get_secret("TWITTER_CONSUMER_SECRET", None),
@@ -56,6 +57,8 @@ try:
 except ImportError:
     pass
 else:
+    print("Slack not installed")
+
     DEFAULTS.update({
         "SLACK_TOKEN": get_secret("SLACK_TOKEN", None),
         "SLACK_CHANNEL": get_secret("SLACK_CHANNEL", None),

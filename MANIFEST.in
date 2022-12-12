@@ -1,5 +1,6 @@
 include README.md
-include requirements.txt
-include requirements.dev.txt
+include requirements/requirements.txt
+include requirements/requirements.dev.txt
+include requirements/requirements.ext.txt
 include LICENSE
 recursive-include certego_saas *.html *.png

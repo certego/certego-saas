@@ -30,7 +30,7 @@ jobs:
       use_pylint: false
       use_bandit: false
 
-      requirements_path: requirements.txt
+      requirements_path: requirements/requirements.txt
 
       django_settings_module: example_project.settings
 

@@ -30,7 +30,7 @@ class _TwitterInterface(metaclass=abc.ABCMeta):
         pass
 
 
-if settings.DEBUG or settings.TESTING:
+if settings.DEBUG or certego_apps_settings.TESTING:
     class Twitter(_TwitterInterface):
         def post_tweet(
                 self,

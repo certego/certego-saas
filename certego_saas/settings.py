@@ -45,7 +45,7 @@ DEFAULTS = {
     "TWITTER_CONSUMER_SECRET": get_secret("TWITTER_CONSUMER_SECRET", None),
     "TWITTER_TOKEN_KEY": get_secret("TWITTER_TOKEN_KEY", None),
     "TWITTER_TOKEN_SECRET": get_secret("TWITTER_TOKEN_SECRET", None),
-    "TESTING" : sys.argv[1:2] == ['test']
+    "TESTING": sys.argv[1:2] == ['test']
 }
 
 IMPORT_STRINGS = ["USER_ACCESS_SERIALIZER"]

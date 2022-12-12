@@ -26,7 +26,7 @@ class _SlackInterface(metaclass=abc.ABCMeta):
     ):
         pass
 
-if settings.DEBUG or settings.TESTING:
+if settings.DEBUG or certego_apps_settings.TESTING:
     class Slack(_SlackInterface):
         def send_message(
             self, title: str, body: str = "", urgent: bool = False, channel=None

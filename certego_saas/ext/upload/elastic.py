@@ -79,7 +79,7 @@ else:
         creation_date = mongo_fields.DateTimeField(required=True, default=datetime.datetime.now)
         category = mongo_fields.StringField(required=True)
         count = mongo_fields.IntField(required=True, min_value=0)
-        kwargs = mongo_fields.DictField(required=False, null=True)
+        kwargs = mongo_fields.DictField(required=False)
 
 
 

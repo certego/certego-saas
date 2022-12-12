@@ -12,7 +12,7 @@ TEST_RUNNER = "tests.timed_runner.TimedRunner"
 # stripe-python
 try:
     STRIPE_LIVE_MODE = (
-        settings.PUBLIC_DEPLOYMENT and not settings.STAGE_CI and not settings.DEBUG
+            settings.PUBLIC_DEPLOYMENT and not settings.STAGE_CI and not settings.DEBUG
     )
 except AttributeError:
     STRIPE_LIVE_MODE = False
@@ -37,15 +37,32 @@ DEFAULTS = {
     "HOST_URI": settings.HOST_URI,
     "HOST_NAME": settings.HOST_NAME,
     # third party keys
-    "SLACK_TOKEN": get_secret("SLACK_TOKEN", None),
-    "SLACK_CHANNEL": get_secret("SLACK_CHANNEL", None),
-    "TWITTER_CONSUMER_KEY": get_secret("TWITTER_CONSUMER_KEY", None),
-    "TWITTER_CONSUMER_SECRET": get_secret("TWITTER_CONSUMER_SECRET", None),
-    "TWITTER_TOKEN_KEY": get_secret("TWITTER_TOKEN_KEY", None),
-    "TWITTER_TOKEN_SECRET": get_secret("TWITTER_TOKEN_SECRET", None),
     "STRIPE_LIVE_MODE": STRIPE_LIVE_MODE,
     "STRIPE_WEBHOOK_SIGNING_KEY": get_secret("STRIPE_WEBHOOK_SIGNING_KEY", None),
 }
+try:
+    import twitter
+except ImportError:
+    pass
+else:
+    DEFAULTS.update({
+        "TWITTER_CONSUMER_KEY": get_secret("TWITTER_CONSUMER_KEY", None),
+        "TWITTER_CONSUMER_SECRET": get_secret("TWITTER_CONSUMER_SECRET", None),
+        "TWITTER_TOKEN_KEY": get_secret("TWITTER_TOKEN_KEY", None),
+        "TWITTER_TOKEN_SECRET": get_secret("TWITTER_TOKEN_SECRET", None),
+    })
+try:
+    import slack_sdk
+except ImportError:
+    pass
+else:
+    DEFAULTS.update({
+        "SLACK_TOKEN": get_secret("SLACK_TOKEN", None),
+        "SLACK_CHANNEL": get_secret("SLACK_CHANNEL", None),
+
+    }
+
+    )
 
 IMPORT_STRINGS = ["USER_ACCESS_SERIALIZER"]
 

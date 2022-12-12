@@ -1,15 +1,11 @@
 import abc
 import datetime
-import enum
-from importlib import util
 import logging
 from typing import List, Union, Dict, overload, Tuple, Any
 
-from django.db.models import Model, JSONField, QuerySet
-from django.db.models import fields as django_fields
+
 from elasticsearch.helpers import bulk
-from mongoengine import Document
-from mongoengine import fields as mongo_fields
+
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +18,6 @@ class __BIDocumentInterface(abc.ABC):
     category:str
     count: int
     kwargs: Dict[str, str]
-    objects: QuerySet
 
     def to_json(self) -> Dict[str, Any]:
         return {
@@ -58,8 +53,21 @@ class __BIDocumentInterface(abc.ABC):
         self.kwargs = {key.replace("__", "."): value for key, value in self.kwargs.items()}
 
 
+try:
+    from mongoengine import Document
+    from mongoengine import fields as mongo_fields
 
-if util.find_spec("mongoengine"):
+except ImportError:
+    from django.db.models import Model, JSONField, QuerySet
+    from django.db.models import fields as django_fields
+    class BIDocument(__BIDocumentInterface, Model):
+        index = django_fields.CharField(max_length=100)
+        creation_date = django_fields.DateTimeField(auto_now_add=True)
+        category = django_fields.CharField(max_length=100)
+        count = django_fields.PositiveIntegerField()
+        kwargs = JSONField()
+else:
+
     class BIDocument(__BIDocumentInterface, Document):
         index = mongo_fields.StringField(required=True)
         creation_date = mongo_fields.DateTimeField(required=True, default=datetime.datetime.now)
@@ -67,12 +75,6 @@ if util.find_spec("mongoengine"):
         count = mongo_fields.IntField(required=True, min_value=0)
         kwargs = mongo_fields.DictField(required=False, null=True)
 
-else:
-    class BIDocument(__BIDocumentInterface, Model):
-        index = django_fields.CharField(max_length=100)
-        creation_date = django_fields.DateTimeField(auto_now_add=True)
-        category = django_fields.CharField(max_length=100)
-        count = django_fields.PositiveIntegerField()
-        kwargs = JSONField()
+
 
 

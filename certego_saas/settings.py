@@ -37,7 +37,6 @@ DEFAULTS = {
     "HOST_URI": settings.HOST_URI,
     "HOST_NAME": settings.HOST_NAME,
     # third party keys
-    "STRIPE_LIVE_MODE": STRIPE_LIVE_MODE,
     "STRIPE_WEBHOOK_SIGNING_KEY": get_secret("STRIPE_WEBHOOK_SIGNING_KEY", None),
     "SLACK_TOKEN": get_secret("SLACK_TOKEN", None),
     "SLACK_CHANNEL": get_secret("SLACK_CHANNEL", None),

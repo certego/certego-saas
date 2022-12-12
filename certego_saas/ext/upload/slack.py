@@ -34,7 +34,7 @@ if settings.DEBUG:
             self.log.info(f"{title}\n{body}")
 
 else:
-    class _Slack(_SlackInterface):
+    class Slack(_SlackInterface):
         """
         Slack client.
         """

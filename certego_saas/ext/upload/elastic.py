@@ -36,8 +36,11 @@ class __BIDocumentInterface:
             }
 
     @classmethod
-    def upload(cls, client: elasticsearch.Elasticsearch, index:str, timeout:int=30, max_number:int=None) -> Tuple:
-        docs = cls.objects.filter(index=index).order_by("+time")
+    def upload(cls, client: elasticsearch.Elasticsearch, index:str=None, timeout:int=30, max_number:int=None) -> Tuple:
+        qs = cls.objects
+        if index:
+            qs.filter(index=index)
+        docs = qs.order_by("+time")
         if max_number:
             docs = docs[:max_number]
         jsons = map(lambda x: x.to_bulk(), docs)

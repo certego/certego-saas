@@ -31,16 +31,18 @@ class _TwitterInterface(metaclass=abc.ABCMeta):
 
 
 if settings.DEBUG or certego_apps_settings.TESTING:
+
     class Twitter(_TwitterInterface):
         def post_tweet(
-                self,
-                msg: str,
-                media: List[Union[str, models.FileField]] = None,
-                header: str = None,
+            self,
+            msg: str,
+            media: List[Union[str, models.FileField]] = None,
+            header: str = None,
         ):
             self.log.debug(f"{header if header else ''}:  {msg}")
 
 else:
+
     class Twitter(_TwitterInterface):
         """
         Twitter client.
@@ -93,4 +95,3 @@ else:
                 result_id = self.client.PostUpdate(
                     status=msg, in_reply_to_status_id=result_id
                 ).id
-

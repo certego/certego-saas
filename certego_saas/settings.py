@@ -13,7 +13,7 @@ TEST_RUNNER = "tests.timed_runner.TimedRunner"
 # stripe-python
 try:
     STRIPE_LIVE_MODE = (
-            settings.PUBLIC_DEPLOYMENT and not settings.STAGE_CI and not settings.DEBUG
+        settings.PUBLIC_DEPLOYMENT and not settings.STAGE_CI and not settings.DEBUG
     )
 except AttributeError:
     STRIPE_LIVE_MODE = False
@@ -46,7 +46,7 @@ DEFAULTS = {
     "TWITTER_TOKEN_SECRET": get_secret("TWITTER_TOKEN_SECRET", None),
     "STRIPE_LIVE_MODE": STRIPE_LIVE_MODE,
     "STRIPE_WEBHOOK_SIGNING_KEY": get_secret("STRIPE_WEBHOOK_SIGNING_KEY", None),
-    "TESTING": sys.argv[1:2] == ['test']
+    "TESTING": sys.argv[1:2] == ["test"],
 }
 
 IMPORT_STRINGS = ["USER_ACCESS_SERIALIZER"]

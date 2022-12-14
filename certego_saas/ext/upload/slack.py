@@ -1,6 +1,5 @@
 import abc
 import logging
-from typing import Type, Union
 
 from django.conf import settings
 from slack_sdk import WebClient
@@ -14,8 +13,6 @@ __all__ = [
 
 
 class _SlackInterface(metaclass=abc.ABCMeta):
-
-
     @property
     def log(self):
         return logging.getLogger(f"certego_saas.{self.__class__.__name__}")
@@ -26,7 +23,9 @@ class _SlackInterface(metaclass=abc.ABCMeta):
     ):
         pass
 
+
 if settings.DEBUG or certego_apps_settings.TESTING:
+
     class Slack(_SlackInterface):
         def send_message(
             self, title: str, body: str = "", urgent: bool = False, channel=None
@@ -34,6 +33,7 @@ if settings.DEBUG or certego_apps_settings.TESTING:
             self.log.info(f"{title}\n{body}")
 
 else:
+
     class Slack(_SlackInterface):
         """
         Slack client.

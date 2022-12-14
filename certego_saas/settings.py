@@ -38,13 +38,14 @@ DEFAULTS = {
     "HOST_URI": settings.HOST_URI,
     "HOST_NAME": settings.HOST_NAME,
     # third party keys
-    "STRIPE_WEBHOOK_SIGNING_KEY": get_secret("STRIPE_WEBHOOK_SIGNING_KEY", None),
     "SLACK_TOKEN": get_secret("SLACK_TOKEN", None),
     "SLACK_CHANNEL": get_secret("SLACK_CHANNEL", None),
     "TWITTER_CONSUMER_KEY": get_secret("TWITTER_CONSUMER_KEY", None),
     "TWITTER_CONSUMER_SECRET": get_secret("TWITTER_CONSUMER_SECRET", None),
     "TWITTER_TOKEN_KEY": get_secret("TWITTER_TOKEN_KEY", None),
     "TWITTER_TOKEN_SECRET": get_secret("TWITTER_TOKEN_SECRET", None),
+    "STRIPE_LIVE_MODE": STRIPE_LIVE_MODE,
+    "STRIPE_WEBHOOK_SIGNING_KEY": get_secret("STRIPE_WEBHOOK_SIGNING_KEY", None),
     "TESTING": sys.argv[1:2] == ['test']
 }
 

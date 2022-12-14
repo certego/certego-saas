@@ -1,4 +1,5 @@
 import os
+import sys
 
 import stripe
 from django.conf import settings
@@ -45,6 +46,7 @@ DEFAULTS = {
     "TWITTER_TOKEN_SECRET": get_secret("TWITTER_TOKEN_SECRET", None),
     "STRIPE_LIVE_MODE": STRIPE_LIVE_MODE,
     "STRIPE_WEBHOOK_SIGNING_KEY": get_secret("STRIPE_WEBHOOK_SIGNING_KEY", None),
+    "TESTING": sys.argv[1:2] == ["test"],
 }
 
 IMPORT_STRINGS = ["USER_ACCESS_SERIALIZER"]

@@ -1,4 +1,3 @@
-import abc
 import logging
 import re
 from typing import List, Union
@@ -14,39 +13,26 @@ __all__ = [
     "Twitter",
 ]
 
+logger = logging.getLogger(__name__)
 
-class _TwitterInterface(metaclass=abc.ABCMeta):
-    @property
-    def log(self):
-        return logging.getLogger(f"certego_saas.{self.__class__.__name__}")
 
-    @abc.abstractmethod
+class _Twitter:
     def post_tweet(
         self,
         msg: str,
         media: List[Union[str, models.FileField]] = None,
         header: str = None,
     ):
-        pass
+        logger.info(f"{header if header else ''}:  {msg}")
 
 
 if settings.DEBUG or certego_apps_settings.TESTING:
 
-    class Twitter(_TwitterInterface):
-        def post_tweet(
-            self,
-            msg: str,
-            media: List[Union[str, models.FileField]] = None,
-            header: str = None,
-        ):
-            self.log.debug(f"{header if header else ''}:  {msg}")
+    Twitter = _Twitter
 
 else:
 
-    class Twitter(_TwitterInterface):
-        """
-        Twitter client.
-        """
+    class Twitter(_Twitter):
 
         CHARACTER_LIMIT = twitter_lib.api.CHARACTER_LIMIT
         client = twitter_lib.Api(
@@ -70,9 +56,6 @@ else:
             media: List[Union[str, models.FileField]] = None,
             header: str = None,
         ):
-            """
-            To post a tweet.
-            """
             urls = self.__parse(msg)
             msg = strip_tags(msg)
             msg += " ".join(urls)
@@ -89,7 +72,7 @@ else:
                 ]
             else:
                 messages = [msg]
-            self.log.info(messages)
+            logger.info(messages)
             result_id = self.client.PostUpdate(status=messages[0], media=media).id
             for msg in messages[1:]:
                 result_id = self.client.PostUpdate(

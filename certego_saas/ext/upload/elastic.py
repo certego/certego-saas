@@ -46,6 +46,7 @@ class __BIDocumentInterface:
         docs = qs.order_by("+time")
         if max_number:
             docs = docs[:max_number]
+        logger.info(docs)
         jsons = map(lambda x: x.to_bulk(), docs)
         success, errors = bulk(client, jsons, request_timeout=timeout)
         docs.delete()
@@ -55,6 +56,9 @@ class __BIDocumentInterface:
         self.kwargs = {
             key.replace("__", "."): value for key, value in self.kwargs.items()
         }
+
+    def __repr__(self):
+        return f"|{self.index=}, {self.category=}, {self.count=}, {self.kwargs=}"
 
 
 try:

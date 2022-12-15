@@ -22,10 +22,10 @@ class _Slack:
         return msg
 
     def send_message(
-        self, title: str, body: str = "", urgent: bool = False, channel=None
+        self, title: str, channel: str, body: str = "", urgent: bool = False
     ):
         msg = self.create_msg(title, body, urgent)
-        logger.info(f"Slack Message: {msg}")
+        logger.info(f"Slack Message: {msg} on channel {channel}")
 
 
 if settings.DEBUG or certego_apps_settings.TESTING:
@@ -36,17 +36,14 @@ else:
 
     class Slack(_Slack):
 
-        token = certego_apps_settings.SLACK_TOKEN
-        channel = certego_apps_settings.SLACK_CHANNEL
+        token = settings.SLACK_TOKEN
 
         client = WebClient(token=token)
 
         def send_message(
-            self, title: str, body: str = "", urgent: bool = False, channel=None
+            self, title: str, channel: str, body: str = "", urgent: bool = False
         ):
-            super().send_message(title, body, urgent, channel)
-            if channel is None:
-                channel = self.channel
+            super().send_message(title, channel, body, urgent)
             message = self.create_msg(title, body, urgent)
             try:
                 return self.client.chat_postMessage(

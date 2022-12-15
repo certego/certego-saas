@@ -62,10 +62,10 @@ else:
 
         CHARACTER_LIMIT = twitter_lib.api.CHARACTER_LIMIT
         client = twitter_lib.Api(
-            consumer_key=certego_apps_settings.TWITTER_CONSUMER_KEY,
-            consumer_secret=certego_apps_settings.TWITTER_CONSUMER_SECRET,
-            access_token_key=certego_apps_settings.TWITTER_TOKEN_KEY,
-            access_token_secret=certego_apps_settings.TWITTER_TOKEN_SECRET,
+            consumer_key=settings.TWITTER_CONSUMER_KEY,
+            consumer_secret=settings.TWITTER_CONSUMER_SECRET,
+            access_token_key=settings.TWITTER_ACCESS_TOKEN,
+            access_token_secret=settings.TWITTER_ACCESS_TOKEN_SECRET,
         )
 
         def __init__(self):

@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.db import models
 
@@ -7,6 +9,7 @@ from certego_saas.ext.upload import Slack
 __all__ = [
     "UserFeedback",
 ]
+logger = logging.getLogger(__name__)
 
 
 class UserFeedback(TimestampedModel, AppSpecificModel):
@@ -28,7 +31,7 @@ class UserFeedback(TimestampedModel, AppSpecificModel):
     category = models.CharField(max_length=32, choices=FEEDBACK_CATEGORIES)
     message = models.TextField(null=False, blank=False)
 
-    def send_to_slack(self):
+    def send_to_slack(self, channel: str):
         slack = Slack()
         try:
             slack.send_message(
@@ -38,8 +41,9 @@ class UserFeedback(TimestampedModel, AppSpecificModel):
                 + "Message:"
                 + "\n"
                 + f"> {self.message}",
+                channel=channel,
             )
         except Slack.SlackApiError as exc:
-            slack.log.error(
+            logger.error(
                 f"Slack message failed for feedback(#{self.pk}) with error: {str(exc)}"
             )

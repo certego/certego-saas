@@ -17,13 +17,39 @@ logger = logging.getLogger(__name__)
 
 
 class _Twitter:
+    @staticmethod
+    def __get_urls(msg) -> List[str]:
+        return re.findall(r'href=[\'"]?([^\'" >]+)', msg)
+
+    def create_messages(
+        self, msg: str, header: Union[None, str], max_char: int
+    ) -> List[str]:
+        urls = self.__get_urls(msg)
+        msg = strip_tags(msg)
+        msg += " ".join(urls)
+        # i wanna add a custom delimiter + initial message
+        if header:
+            msg = header + " " + msg
+        size = max_char - 9
+        if len(msg) >= max_char:
+            # splitting the text in N messages
+            messages = [msg[i : i + size] for i in range(0, len(msg), size)]
+            # adding 0/10, 1/10 to the end of the messages
+            messages = [
+                msg + f" {i}/{len(messages) - 1}" for i, msg in enumerate(messages)
+            ]
+        else:
+            messages = [msg]
+        return messages
+
     def post_tweet(
         self,
         msg: str,
         media: List[Union[str, models.FileField]] = None,
         header: str = None,
     ):
-        logger.info(f"{header if header else ''}:  {msg}")
+        for i, message in enumerate(self.create_messages(msg, header, max_char=50)):
+            logger.info(f"Tweet {i}: {message}")
 
 
 if settings.DEBUG or certego_apps_settings.TESTING:
@@ -46,33 +72,14 @@ else:
             if not self.client.VerifyCredentials():
                 raise Exception("Wrong credentials")
 
-        @staticmethod
-        def __parse(msg) -> List[str]:
-            return re.findall(r'href=[\'"]?([^\'" >]+)', msg)
-
         def post_tweet(
             self,
             msg: str,
             media: List[Union[str, models.FileField]] = None,
             header: str = None,
         ):
-            urls = self.__parse(msg)
-            msg = strip_tags(msg)
-            msg += " ".join(urls)
-            # i wanna add a custom delimiter + initial message
-            if header:
-                msg = header + " " + msg
-            size = self.CHARACTER_LIMIT - 9
-            if len(msg) >= self.CHARACTER_LIMIT:
-                # splitting the text in N messages
-                messages = [msg[i : i + size] for i in range(0, len(msg), size)]
-                # adding 0/10, 1/10 to the end of the messages
-                messages = [
-                    msg + f" {i}/{len(messages) - 1}" for i, msg in enumerate(messages)
-                ]
-            else:
-                messages = [msg]
-            logger.info(messages)
+            super().post_tweet(msg, media, header)
+            messages = self.create_messages(msg, header, self.CHARACTER_LIMIT)
             result_id = self.client.PostUpdate(status=messages[0], media=media).id
             for msg in messages[1:]:
                 result_id = self.client.PostUpdate(

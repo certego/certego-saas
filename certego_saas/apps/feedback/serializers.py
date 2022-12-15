@@ -1,5 +1,6 @@
-from django.conf import settings
 from rest_framework import serializers as rfs
+
+from certego_saas.settings import certego_apps_settings
 
 from .models import UserFeedback
 
@@ -24,5 +25,5 @@ class UserFeedbackSerializer(rfs.ModelSerializer):
         # below function does not raise any exception
         # because we should not respond with error
         # if the slack API fails since it's an internal use-case
-        feedback.send_to_slack(settings.DEFAULT_SLACK_CHANNEL)
+        feedback.send_to_slack(certego_apps_settings.DEFAULT_SLACK_CHANNEL)
         return feedback

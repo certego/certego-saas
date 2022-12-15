@@ -17,12 +17,14 @@ class __BIDocumentInterface:
     kwargs: Dict[str, str]
 
     def to_json(self) -> Dict[str, Any]:
-        return {
+        res = {
             "timestamp": self.creation_date,
             "bi_category": self.category,
             "count": self.count,
             **self.kwargs,
         }
+        logger.info(f"Json document: {res}")
+        return res
 
     def to_bulk(self) -> Dict[str, Any]:
         return {
@@ -46,7 +48,7 @@ class __BIDocumentInterface:
         docs = qs.order_by("+time")
         if max_number:
             docs = docs[:max_number]
-        logger.info(docs)
+        logger.info(f"Uploading {docs.count()} documents")
         jsons = map(lambda x: x.to_bulk(), docs)
         success, errors = bulk(client, jsons, request_timeout=timeout)
         docs.delete()

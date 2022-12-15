@@ -16,3 +16,4 @@ slack_sdk >= 3.11.2
 stripe >= 2.61.0
 python-twitter ~= 3.5
 Markdown ~= 3.3.6
+elasticsearch >= 6.0.0

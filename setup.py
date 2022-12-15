@@ -10,11 +10,12 @@ GITHUB_URL = "https://github.com/certego/certego-saas"
 
 # The directory containing this file
 HERE = Path(__file__).parent
+REQUIREMENTS = HERE / "requirements"
 # The text of the README file
 README = (HERE / "README.md").read_text()
 # Define requirements
-requirements = (HERE / "requirements.txt").read_text().split("\n")
-requirements_dev = (HERE / "requirements.dev.txt").read_text().split("\n")
+requirements = (REQUIREMENTS / "requirements.txt").read_text().split("\n")
+requirements_dev = (REQUIREMENTS / "requirements.dev.txt").read_text().split("\n")
 # read version
 version_contents = {}
 with open((HERE / "certego_saas" / "version.py"), encoding="utf-8") as f:

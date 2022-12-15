@@ -39,7 +39,7 @@ DEFAULTS = {
     "HOST_NAME": settings.HOST_NAME,
     # third party keys
     "SLACK_TOKEN": get_secret("SLACK_TOKEN", None),
-    "SLACK_CHANNEL": get_secret("SLACK_CHANNEL", None),
+    "DEFAULT_SLACK_CHANNEL": get_secret("DEFAULT_SLACK_CHANNEL", None),
     "TWITTER_CONSUMER_KEY": get_secret("TWITTER_CONSUMER_KEY", None),
     "TWITTER_CONSUMER_SECRET": get_secret("TWITTER_CONSUMER_SECRET", None),
     "TWITTER_ACCESS_TOKEN": get_secret("TWITTER_ACCESS_TOKEN", None),

@@ -100,7 +100,7 @@ def _should_log(exc, context) -> bool:
 
     if view:
         code = getattr(exc, "status_code", None)
-        if code in [404, 400] or exc.__class__.__name__ == "Http404":
+        if 400 <= code <= 498 or exc.__class__.__name__ == "Http404":
             flag = False
 
     return flag

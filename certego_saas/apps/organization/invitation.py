@@ -66,11 +66,8 @@ class Invitation(TimestampedModel):
     class MaxMemberException(ValidationError):
         default_detail = "Organization reached maximum number of members."
 
-    class AlreadyPresentException(ValidationError):
-        default_detail = "Invite failed. User is already part of the organization."
-
-    class AlreadyPendingException(ValidationError):
-        default_detail = "A similar invite for the user is already pending."
+    class InviteFailedException(ValidationError):
+        default_detail = "Invite failed."
 
     class PreviouslyDeclinedException(ValidationError):
         default_detail = "Invitation was previously declined."
@@ -85,6 +82,10 @@ class Invitation(TimestampedModel):
 
     def accept(self) -> None:
         if self.organization.members_count >= self.organization.MAX_MEMBERS:
+            logger.info(
+                f"accept failed because members count {self.organization.members_count}"
+                f" is greater than max members {self.organization.MAX_MEMBERS}"
+            )
             raise self.MaxMemberException()
         if self.user.has_membership():
             raise Membership.ExistingMembershipException()

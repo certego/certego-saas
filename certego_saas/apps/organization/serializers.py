@@ -85,7 +85,7 @@ class InviteCreateSerializer(rfs.Serializer):
         try:
             invitee = User.objects.get(username=username)
         except User.DoesNotExist:
-            raise rfs.ValidationError({"detail": "Failed. No such user found."})
+            raise rfs.ValidationError({"detail": "Failed"})
 
         return org.invite(
             invitee,

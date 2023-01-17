@@ -191,7 +191,7 @@ class TestOrganization(CustomTestCase):
         # invite user2
         response, content = self.__send_invite(self.user2.get_username())
         msg = (response, content)
-        exc = Invitation.AlreadyPresentException
+        exc = Invitation.InviteFailedException
 
         # asserts
         self.assertEqual(exc.status_code, response.status_code, msg=msg)
@@ -208,7 +208,7 @@ class TestOrganization(CustomTestCase):
         # invite user2 again
         response, content = self.__send_invite(self.user2.get_username())
         msg = (response, content)
-        exc = Invitation.AlreadyPendingException
+        exc = Invitation.InviteFailedException
 
         # asserts
         self.assertEqual(exc.status_code, response.status_code, msg=msg)

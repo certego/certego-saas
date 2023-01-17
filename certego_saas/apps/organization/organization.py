@@ -2,7 +2,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from cache_memoize import cache_memoize
-from django.db import IntegrityError, models, transaction
+from django.db import models, transaction
 from django.utils.functional import cached_property
 from email_utils import NoTemplatesException
 
@@ -78,15 +78,26 @@ class Organization(TimestampedModel):
         self, user: "User", send_email: bool = False, request=None
     ) -> Invitation:
         if self.members_count >= self.MAX_MEMBERS:
+            logger.info(
+                f"invite failed because members count {self.members_count}"
+                f" is greater than max members {self.MAX_MEMBERS}"
+            )
             raise Invitation.MaxMemberException()
         if self.owner.pk == user.pk:
+            logger.info(
+                f"invite failed because owner can't invite himself {self.owner.full_name}"
+            )
             raise Invitation.OwnerException()
         if self.user_has_membership(user):
-            raise Invitation.AlreadyPresentException()
+            logger.info(
+                f"invite failed because user {self.name} is already member of an org"
+            )
+            raise Invitation.InviteFailedException()
         try:
             inv: Invitation = Invitation.objects.create(user=user, organization=self)
-        except IntegrityError:
-            raise Invitation.AlreadyPendingException()
+        except Exception as e:
+            logger.info(e)
+            raise Invitation.InviteFailedException()
         if send_email and request:
             try:
                 inv.email_invite(request)

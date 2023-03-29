@@ -140,4 +140,5 @@ def post_save_user_handler(sender, instance: Invitation, created: bool, **kwargs
             title=f"You have been invited to Organization {instance.organization.name}",
             body="You can accept or decline the invite on the Organization page",
             for_user=instance.user,
+            appname=Notification.AppChoices.CURRENTAPP,
         )

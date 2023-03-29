@@ -4,6 +4,7 @@ from django.db import transaction
 from django.test import tag
 from rest_framework.reverse import reverse
 
+from certego_saas.apps.notifications.models import Notification
 from certego_saas.apps.organization.models import Invitation, Membership, Organization
 
 from ... import CustomTestCase, User, setup_custom_user
@@ -19,6 +20,7 @@ class TestInvitation(CustomTestCase):
         Membership.objects.all().delete()
         Organization.objects.all().delete()
         Invitation.objects.all().delete()
+        Notification.objects.all().delete()
         # create 2 test users
         self.user1: User = User.objects.get_or_create(username="testinvuser1")[0]
         self.user2: User = User.objects.get_or_create(username="testinvuser2")[0]
@@ -228,7 +230,9 @@ class TestInvitation(CustomTestCase):
     def __create_invitation(self, organization) -> Invitation:
         # create invitation
         self.assertEqual(0, Invitation.objects.all().count())
+        self.assertEqual(0, Notification.objects.all().count())
         inv = Invitation.objects.create(user=self.user2, organization=organization)
         self.assertEqual(1, Invitation.objects.all().count())
+        self.assertEqual(1, Notification.objects.all().count())
 
         return inv

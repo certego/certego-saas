@@ -26,7 +26,7 @@ class Notification(TimestampedModel, AppSpecificModel):
     for_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="notifications",
-        help_text="The notification is for a specif user. Empty == for everyone",
+        help_text="If the field is empty, the notification is for everyone; otherwise only for the specified user",
         null=True,
         on_delete=models.CASCADE,
     )

@@ -1,5 +1,6 @@
 import logging
 
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -27,6 +28,7 @@ class NotificationViewSet(ReadOnlyViewSet):
     # i have absolutely no fucking idea on why the fuck the filtering class is not working, so i'm just doing it manually
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(Q(for_user__isnull=True) | Q(for_user=request.user))
         if "read" in request.query_params:
             value = request.query_params["read"]
             if value == "true":
@@ -40,6 +42,10 @@ class NotificationViewSet(ReadOnlyViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def check_object_permissions(self, request, obj: Notification):
+        if not obj.is_for_user(request.user):
+            raise PermissionError(f"You can't access this {obj.__class__.__name__}")
 
     def get_queryset(self):
         qs = super().get_queryset()

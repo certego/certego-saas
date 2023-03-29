@@ -3,6 +3,7 @@ import logging
 import email_utils
 from django.conf import settings
 from django.db import models, transaction
+from django.dispatch import receiver
 from rest_framework.exceptions import ValidationError
 
 from certego_saas.ext.models import TimestampedModel
@@ -127,4 +128,16 @@ class Invitation(TimestampedModel):
         )
 
     def __str__(self):
-        return f"Invitation<{self.status}>"
+        return f"{self.__class__.__name__}<{self.status}>"
+
+
+@receiver(models.signals.post_save, sender=Invitation)
+def post_save_user_handler(sender, instance: Invitation, created: bool, **kwargs):
+    from certego_saas.apps.notifications.models import Notification
+
+    if created:
+        Notification.objects.create(
+            title=f"You have been invited to Organization {instance.organization.name}",
+            body="You can accept or decline the invite on the Organization page",
+            for_user=instance.user,
+        )

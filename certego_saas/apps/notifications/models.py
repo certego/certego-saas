@@ -23,6 +23,16 @@ class Notification(TimestampedModel, AppSpecificModel):
         help_text="To store which users have read a particular notification.",
         blank=True,
     )
+    for_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="notifications",
+        help_text="The notification is for a specif user. Empty == for everyone",
+        null=True,
+        on_delete=models.CASCADE,
+    )
 
     def is_read_by_user(self, user) -> bool:
         return self.read_by_users.filter(pk=user.pk).exists()
+
+    def is_for_user(self, user) -> bool:
+        return self.for_user is None or self.for_user.pk == user.pk

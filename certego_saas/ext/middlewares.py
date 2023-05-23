@@ -61,7 +61,11 @@ class BlockListForwardedForMiddleware:
         # the view (and later middleware) are called.
 
         remote_addr = request.headers.get("X-Forwarded-For", "")
-        if remote_addr in settings.BLOCKLIST_FORWARDED_FOR:
+        try:
+            blocklist = settings.BLOCKLIST_FORWARDED_FOR
+        except AttributeError:
+            blocklist = []
+        if remote_addr in blocklist:
             raise Http404(f"Request has X-Forwarded-For set to {remote_addr}: blocked")
 
         response = self.get_response(request)

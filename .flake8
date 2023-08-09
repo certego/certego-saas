@@ -9,8 +9,13 @@ exclude =
     certego_django_apps/migrations
     example_project
 ignore =
-    F821, # undefined name 'Rule'
-    W503, # line break before binary operator
-    E402, # module level import not at top of file
-    W291, # trailing whitespace nightmare
-    E203, # whitespace before ':'
+    # undefined name 'Rule'
+    F821,
+    # line break before binary operator
+    W503,
+    # module level import not at top of file
+    E402,
+    # trailing whitespace nightmare
+    W291,
+    # whitespace before ':'
+    E203,

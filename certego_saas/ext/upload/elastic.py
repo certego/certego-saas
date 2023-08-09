@@ -72,7 +72,6 @@ except ImportError:
     from django.db.models import fields as django_fields
 
     class BIDocument(__BIDocumentInterface, Model):
-
         index = django_fields.CharField(max_length=100)
         creation_date = django_fields.DateTimeField(auto_now_add=True)
         category = django_fields.CharField(max_length=100)

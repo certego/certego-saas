@@ -1,4 +1,3 @@
--r ../requirements.dev.txt
 django>=3.0
 commonmark==0.9.1
 docutils==0.16

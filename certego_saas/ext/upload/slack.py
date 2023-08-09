@@ -29,13 +29,11 @@ class _Slack:
 
 
 if settings.DEBUG or certego_apps_settings.TESTING:
-
     Slack = _Slack
 
 else:
 
     class Slack(_Slack):
-
         token = settings.SLACK_TOKEN
 
         client = WebClient(token=token)

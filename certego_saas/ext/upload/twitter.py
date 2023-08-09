@@ -53,13 +53,11 @@ class _Twitter:
 
 
 if settings.DEBUG or certego_apps_settings.TESTING:
-
     Twitter = _Twitter
 
 else:
 
     class Twitter(_Twitter):
-
         CHARACTER_LIMIT = twitter_lib.api.CHARACTER_LIMIT
         client = twitter_lib.Api(
             consumer_key=certego_apps_settings.TWITTER_CONSUMER_KEY,

@@ -11,12 +11,14 @@ class MembershipAdmin(admin.ModelAdmin):
         "user",
         "organization",
         "is_owner",
+        "is_admin",
         "created_at",
     )
 
     list_filter = (
         "organization",
         "is_owner",
+        "is_admin",
     )
 
 

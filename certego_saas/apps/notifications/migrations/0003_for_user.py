@@ -3,7 +3,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("certego_saas_notifications", "0002_alter_notification_appname"),
     ]

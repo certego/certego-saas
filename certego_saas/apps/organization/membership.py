@@ -33,8 +33,17 @@ class Membership(TimestampedModel):
         on_delete=models.CASCADE,
     )
     is_owner = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
 
     # funcs
+    def clean_admin(self):
+        if self.is_owner and not self.is_admin:
+            # an owner must be an admin, permissions will be checked on this field
+            self.is_admin = True
+
+    def clean(self):
+        super().clean()
+        self.clean_admin()
 
     def __str__(self):
         member_str = "owner" if self.is_owner else "member"
@@ -48,4 +57,7 @@ class Membership(TimestampedModel):
         )
 
     class OwnerCantLeaveException(ValidationError):
-        default_detail = "Owner cannot leave the organization but can choose to delete the organization."
+        default_detail = (
+            "Owner cannot leave the organization"
+            "but can choose to delete the organization."
+        )

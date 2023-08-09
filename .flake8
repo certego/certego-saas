@@ -7,9 +7,10 @@ exclude =
     build
     venv*
     certego_django_apps/migrations
+    example_project
 ignore =
-    F821 # undefined name 'Rule'
-    W503 # line break before binary operator
-    E402 # module level import not at top of file
-    W291 # trailing whitespace nightmare
-    E203 # whitespace before ':'
+    F821, # undefined name 'Rule'
+    W503, # line break before binary operator
+    E402, # module level import not at top of file
+    W291, # trailing whitespace nightmare
+    E203, # whitespace before ':'

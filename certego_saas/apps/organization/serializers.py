@@ -18,7 +18,7 @@ __all__ = [
 class _UserMemberSerializer(FlexFieldsModelSerializer):
     class Meta:
         model = Membership
-        fields = ["username", "full_name", "joined"]
+        fields = ["username", "full_name", "joined", "is_admin"]
 
     joined = rfs.DateTimeField(source="created_at")
     username = rfs.CharField(source="user.username")

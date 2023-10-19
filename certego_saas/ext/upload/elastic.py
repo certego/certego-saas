@@ -23,7 +23,7 @@ class __BIDocumentInterface:
             "count": self.count,
             **self.kwargs,
         }
-        logger.info(f"Json document: {res}")
+        logger.debug(f"Json document: {res}")
         return res
 
     def to_bulk(self) -> Dict[str, Any]:

@@ -29,6 +29,7 @@ class Notification(TimestampedModel, AppSpecificModel):
         help_text="If the field is empty, the notification is for everyone; otherwise only for the specified user",
         null=True,
         on_delete=models.CASCADE,
+        blank=True,
     )
 
     def is_read_by_user(self, user) -> bool:

@@ -68,7 +68,7 @@ class Organization(TimestampedModel):
 
             org = cls.objects.create(name=name)
             membership = Membership.objects.create(
-                user=owner, organization=org, is_owner=True
+                user=owner, organization=org, is_owner=True, is_admin=True
             )
             org.members.add(membership)
             org.save()

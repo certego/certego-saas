@@ -4,7 +4,7 @@ from rest_framework.permissions import BasePermission
 
 from .membership import Membership
 from .organization import Organization
-
+from ..user.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ class IsObjectAdminPermission(BasePermission):
         logger.debug(f"user: {request.user}, {type(request.user)}")
         logger.debug(f"obj: {obj}, {type(obj)}")
         try:
-            return Membership.objects.get(user=request.user, organization=obj, is_admin=True)
+            return Membership.objects.get(user=User.objects.get(username=request.user), organization=obj, is_admin=True)
         except Membership.DoesNotExist:
             return False
 

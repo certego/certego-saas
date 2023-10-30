@@ -124,18 +124,22 @@ class OrganizationViewSet(GenericViewSet):
 
         ``POST ~/organization/remove_member``.
         """
-        username = request.data.get("username", None)
-        logger.info(f"remove member {username} from user {request.user}")
-        if not username:
+        username_to_remove = request.data.get("username", None)
+        logger.info(f"remove member {username_to_remove} from user {request.user}")
+        if not username_to_remove:
             raise ValidationError("'username' is required.")
         org = self.get_object()
         try:
-            membership = org.members.get(user__username=username)
-            if membership.is_owner:
+            membership_request_user = org.members.get(user__username=request.user)
+            membership_user_to_remove = org.members.get(user__username=username_to_remove)
+            if membership_user_to_remove.is_owner:
                 raise ValidationError("Cannot remove organization owner.")
+            # only the owner can remove the admin
+            if not membership_request_user.is_owner and membership_user_to_remove.is_admin:
+                raise ValidationError("Cannot remove another admin.")
         except Membership.DoesNotExist:
             raise ValidationError("No such member.")
-        membership.delete()
+        membership_user_to_remove.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["POST"])

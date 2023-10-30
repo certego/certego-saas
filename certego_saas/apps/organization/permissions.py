@@ -3,7 +3,6 @@ from rest_framework.permissions import BasePermission
 from .invitation import Invitation
 from .membership import Membership
 from .organization import Organization
-from ..user.models import User
 
 
 class InvitationDestroyObjectPermission(BasePermission):

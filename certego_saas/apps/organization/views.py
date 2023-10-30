@@ -16,7 +16,7 @@ from .organization import Organization
 from .permissions import (
     InvitationDestroyObjectPermission,
     IsObjectOwnerPermission,
-    IsObjectSameOrgPermission,
+    IsObjectSameOrgPermission, IsObjectAdminPermission,
 )
 from .serializers import (
     InvitationsListSerializer,
@@ -61,7 +61,7 @@ class OrganizationViewSet(GenericViewSet):
         if self.request.method.lower() in ["delete"]:
             permissions.append(IsObjectOwnerPermission())
         elif self.action in ["invite", "remove_member"]:
-            permissions.append(IsObjectOwnerPermission())
+            permissions.append(IsObjectAdminPermission())
         elif self.action in ["list", "retrieve", "leave"]:
             permissions.append(IsObjectSameOrgPermission())
         return permissions
@@ -99,7 +99,7 @@ class OrganizationViewSet(GenericViewSet):
     @action(detail=False, methods=["POST"])
     def invite(self, request, *args, **kwargs):
         """
-        Invite user to organization (accessible only to the organization owner).
+        Invite user to organization (accessible only to the organization admin).
 
         ``POST ~/organization/invite``.
         """
@@ -120,7 +120,7 @@ class OrganizationViewSet(GenericViewSet):
     @action(detail=False, methods=["POST"])
     def remove_member(self, request, *args, **kwargs):
         """
-        Remove user's membership from organization (accessible only to the organization owner).
+        Remove user's membership from organization (accessible only to the organization admin).
 
         ``POST ~/organization/remove_member``.
         """

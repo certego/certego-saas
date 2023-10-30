@@ -1,7 +1,12 @@
+import logging
+
 from rest_framework.permissions import BasePermission
 
 from .membership import Membership
 from .organization import Organization
+
+
+logger = logging.getLogger(__name__)
 
 
 class InvitationDestroyObjectPermission(BasePermission):
@@ -31,11 +36,12 @@ class IsObjectOwnerPermission(BasePermission):
 
 class IsObjectAdminPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
-        return False
-        # try:
-        #     return Membership.objects.get(user=request.user, organization=obj, is_admin=True)
-        # except Membership.DoesNotExist:
-        #     return False
+        logger.debug(f"user: {request.user}, {type(request.user)}")
+        logger.debug(f"obj: {obj}, {type(obj)}")
+        try:
+            return Membership.objects.get(user=request.user, organization=obj, is_admin=True)
+        except Membership.DoesNotExist:
+            return False
 
 
 class IsObjectSameOrgPermission(BasePermission):

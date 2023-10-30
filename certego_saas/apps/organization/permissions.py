@@ -31,10 +31,11 @@ class IsObjectOwnerPermission(BasePermission):
 
 class IsObjectAdminPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
-        try:
-            return Membership.objects.get(user=request.user, organization=obj, is_admin=True)
-        except Membership.DoesNotExist:
-            return False
+        return False
+        # try:
+        #     return Membership.objects.get(user=request.user, organization=obj, is_admin=True)
+        # except Membership.DoesNotExist:
+        #     return False
 
 
 class IsObjectSameOrgPermission(BasePermission):

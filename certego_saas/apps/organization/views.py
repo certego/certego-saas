@@ -4,7 +4,7 @@ from django.db.models import Prefetch
 from rest_flex_fields import is_expanded
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -133,10 +133,10 @@ class OrganizationViewSet(GenericViewSet):
             membership_request_user = org.members.get(user__username=request.user)
             membership_user_to_remove = org.members.get(user__username=username_to_remove)
             if membership_user_to_remove.is_owner:
-                raise ValidationError("Cannot remove organization owner.")
+                raise PermissionDenied(detail="Cannot remove organization owner.", code=403)
             # only the owner can remove the admin
             if not membership_request_user.is_owner and membership_user_to_remove.is_admin:
-                raise ValidationError("Cannot remove another admin.")
+                raise PermissionDenied(detail="Cannot remove another admin.", code=403)
         except Membership.DoesNotExist:
             raise ValidationError("No such member.")
         membership_user_to_remove.delete()
@@ -150,7 +150,11 @@ class OrganizationViewSet(GenericViewSet):
         ``POST ~/organization/leave``.
         """
         logger.info(f"leave membership org from user {request.user}")
-        if request.user.membership.is_owner:
+        try:
+            membership = request.user.membership
+        except Membership.DoesNotExist:
+            raise NotFound()
+        if membership.is_owner:
             raise Membership.OwnerCantLeaveException()
         request.user.membership.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

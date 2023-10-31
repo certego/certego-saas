@@ -55,12 +55,23 @@ class TestInvitation(CustomTestCase):
             msg=msg,
         )
 
-    def test_delete_204(self):
+    def test_delete_204_owner(self):
         """Invitation was created by user1
         who is owner of organization
         so only user1 can delete it too
         """
 
+        # delete invitation
+        response = self.__delete_invitation_api(self.invitation.id)
+
+        # assert for API response
+        self.assertEqual(204, response.status_code, msg=response)
+
+    def test_delete_204_admin(self):
+        user: User = User.objects.get_or_create(username="test_admin_org_1")[0]
+        Membership.objects.create(user=user, organization=self.org, is_admin=True)
+
+        self.client.force_authenticate(user)
         # delete invitation
         response = self.__delete_invitation_api(self.invitation.id)
 

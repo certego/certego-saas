@@ -58,6 +58,6 @@ class Membership(TimestampedModel):
 
     class OwnerCantLeaveException(ValidationError):
         default_detail = (
-            "Owner cannot leave the organization"
+            "Owner cannot leave the organization "
             "but can choose to delete the organization."
         )

@@ -1,12 +1,11 @@
-import logging
-
 from django.db import transaction
 from django.test import tag
 from rest_framework.reverse import reverse
 
 from certego_saas.apps.organization.models import Invitation, Membership, Organization
+from certego_saas.settings import certego_apps_settings
 
-from ... import CustomTestCase, User, setup_custom_user
+from ... import CustomTestCase, User
 
 org_uri = reverse("user_organization-list")
 org_leave_uri = reverse("user_organization-leave")
@@ -17,276 +16,344 @@ org_remove_member_uri = reverse("user_organization-remove-member")
 @tag("apps", "organization")
 class TestOrganization(CustomTestCase):
     @classmethod
-    def setUpClass(cls):
-        # create 2 test users
-        cls.user1: User = User.objects.get_or_create(username="testorguser1")[0]
-        cls.user2: User = User.objects.get_or_create(username="testorguser2")[0]
-        # setup client
-        cls.client = setup_custom_user(cls.user1)
-        return super(TestOrganization, cls).setUpClass()
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        # change org user limit
+        Organization.MAX_MEMBERS = 5
+        # create test users
+        cls.user_owner_org_1: User = User.objects.get_or_create(
+            username="test_user_owner_org_1"
+        )[0]
+        cls.user_admin_org_1: User = User.objects.get_or_create(
+            username="test_user_admin_org_1"
+        )[0]
+        cls.user_admin2_org_1: User = User.objects.get_or_create(
+            username="test_user_admin2_org_1"
+        )[0]
+        cls.user_common_org_1: User = User.objects.get_or_create(
+            username="test_user_common_org_1"
+        )[0]
+        cls.user_common2_org_1: User = User.objects.get_or_create(
+            username="test_user_common2_org_1"
+        )[0]
+        cls.user_owner_org_2: User = User.objects.get_or_create(
+            username="test_user_owner_org_2"
+        )[0]
+        cls.user_common_org_2: User = User.objects.get_or_create(
+            username="test_user_common_org_2"
+        )[0]
+        cls.user_no_org: User = User.objects.get_or_create(username="test_user_no_org")[
+            0
+        ]
+        cls.user_invited: User = User.objects.get_or_create(
+            username="test_user_invited"
+        )[0]
+        # NOTE: orgs and memberships are created in the setUp because some tests change them
 
-    @transaction.atomic
-    def setUp(self):
+    @classmethod
+    def tearDownClass(cls) -> None:
+        super().tearDownClass()
+        # reset org member limit
+        Organization.MAX_MEMBERS = certego_apps_settings.ORGANIZATION_MAX_MEMBERS
+        # clean db
+        Invitation.objects.all().delete()
         Membership.objects.all().delete()
         Organization.objects.all().delete()
-        self.user1.refresh_from_db()
-        self.user2.refresh_from_db()
-        self.client.force_authenticate(user=self.user1)
-        return super().setUp()
 
-    # TEST CASES
+    def setUp(self) -> None:
+        super().setUp()
+        # clean db
+        Invitation.objects.all().delete()
+        Membership.objects.all().delete()
+        Organization.objects.all().delete()
+        # create test orgs
+        self.org_1: Organization = Organization.create(
+            name="testorg1", owner=self.user_owner_org_1
+        )
+        self.org_2: Organization = Organization.create(
+            name="testorg2", owner=self.user_owner_org_2
+        )
+        # add users to the orgs
+        Membership.objects.create(
+            user=self.user_admin_org_1, organization=self.org_1, is_admin=True
+        )
+        Membership.objects.create(
+            user=self.user_admin2_org_1, organization=self.org_1, is_admin=True
+        )
+        Membership.objects.create(user=self.user_common_org_1, organization=self.org_1)
+        Membership.objects.create(user=self.user_common2_org_1, organization=self.org_1)
+        Membership.objects.create(user=self.user_common_org_2, organization=self.org_2)
+        # add invite
+        Invitation.objects.create(user=self.user_invited, organization=self.org_2)
+        # refresh the user
+        self.user_owner_org_1.refresh_from_db()
+        self.user_admin_org_1.refresh_from_db()
+        self.user_admin2_org_1.refresh_from_db()
+        self.user_common_org_1.refresh_from_db()
+        self.user_common2_org_1.refresh_from_db()
+        self.user_owner_org_2.refresh_from_db()
+        self.user_common_org_2.refresh_from_db()
+        self.user_no_org.refresh_from_db()
+        self.user_invited.refresh_from_db()
 
-    def test_get_org_expand_200(self):
-        self.assertEqual(0, Organization.objects.count(), msg="No organization exists")
+    def tearDown(self) -> None:
+        super().tearDown()
+        Invitation.objects.all().delete()
+        Membership.objects.all().delete()
+        Organization.objects.all().delete()
+
+    def test_correct_org_creation(self):
+        """User without an org can create an org"""
+        self.assertEqual(2, Organization.objects.count())
 
         # create org
-        org = self.__create_org_add_member()
-
-        # API get call
-        response = self.client.get(f"{org_uri}?expand=members,pending_invitations")
+        self.client.force_authenticate(self.user_no_org)
+        response = self.client.post(org_uri, {"name": "new_org"})
+        self.assertEqual(201, response.status_code)
         content = response.json()
-        msg = (response, content)
-
         # asserts
-        self.assertEqual(1, Organization.objects.count(), msg="1 organization exists")
+        self.assertEqual(3, Organization.objects.count())
+        self.assertEqual("new_org", content["name"])
+        self.assertEqual(1, content["members_count"])
+        self.assertTrue(content["is_user_owner"])
+        self.assertEqual(self.user_no_org.username, content["owner"]["username"])
+        self.assertTrue(content["owner"]["is_admin"])
 
-        self.assertEqual(200, response.status_code, msg=msg)
-        self.assertEqual(org.name, content["name"], msg=msg)
-        self.assertEqual(2, content["members_count"], msg=msg)
-        self.assertTrue(content["is_user_owner"], msg=msg)
-        self.assertEqual(self.user1.username, content["owner"]["username"], msg=msg)
-        self.assertEqual(2, len(content["members"]), msg=msg)
-        self.assertIn("pending_invitations", content, msg=msg)
-
-    def test_create_201_400(self):
-        # creating new org should return 201
-        response = self.client.post(org_uri, data={"name": "testOrg1"})
+    def test_error_org_creation(self):
+        """User in an org (owner, admin or common user) cannot create a new org while they are members."""
+        # error in case the member of an org (owner, admin or common user) try to create a new org
+        # owner user
+        self.client.force_authenticate(self.user_owner_org_1)
+        response = self.client.post(org_uri, data={"name": "no_org"})
         content = response.json()
-        msg = (response, content)
-
-        self.assertEqual(201, response.status_code, msg=msg)
-        self.assertEqual("testOrg1", content["name"], msg=msg)
-        self.assertEqual(self.user1.username, content["owner"]["username"], msg=msg)
-        self.assertEqual(1, content["members_count"], msg=msg)
-        self.assertTrue(content["is_user_owner"], msg=msg)
-
-        # creating new org when org exists should return 400
-        response = self.client.post(org_uri, data={"name": "testOrg2"})
-        content = response.json()
-        msg = (response, content)
-
-        self.assertEqual(400, response.status_code, msg=msg)
         self.assertIn(
-            Membership.ExistingMembershipException.default_detail,
-            content["errors"],
-            msg=msg,
+            Membership.ExistingMembershipException.default_detail, content["errors"]
+        )
+        # admin user
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(org_uri, data={"name": "no_org"})
+        content = response.json()
+        self.assertIn(
+            Membership.ExistingMembershipException.default_detail, content["errors"]
+        )
+        # common user
+        self.client.force_authenticate(self.user_common_org_1)
+        response = self.client.post(org_uri, data={"name": "no_org"})
+        content = response.json()
+        self.assertIn(
+            Membership.ExistingMembershipException.default_detail, content["errors"]
         )
 
-    def test_delete_204(self):
-        """
-        Org's owner is user1, so can delete the org
-        """
-        self.__create_org_add_member()
-
-        # /remove_member API call
+    def test_correct_org_deletion(self):
+        """Org's owner (user_owner_org_1) can delete the org"""
+        self.client.force_authenticate(self.user_owner_org_1)
         response = self.client.delete(org_uri)
+        self.assertEqual(204, response.status_code)
 
-        # assert API response
-        self.assertEqual(204, response.status_code, msg=response)
-
-    def test_delete_403(self):
-        """
-        Org's owner is user1, user2 is just a member so can't delete the org
-        """
-        self.__create_org_add_member()
-
-        # /remove_member API call
-        self.client.force_authenticate(user=self.user2)
-        with self.assertLogs(level=logging.ERROR):
-            response = self.client.delete(org_uri)
-
-        # assert API response
-        self.assertEqual(403, response.status_code, msg=response)
-
-    def test_leave_204(self):
-        """
-        Org's owner is user1, user2 is just a member so can leave
-        """
-        self.__create_org_add_member()
-
-        # /remove_member API call
-        self.client.force_authenticate(user=self.user2)
-        response = self.client.post(org_leave_uri)
-
-        # assert API response
-        self.assertEqual(204, response.status_code, msg=response)
-
-    def test_leave_400_owner_cant_leave(self):
-        """
-        Org's owner is user1, so can't leave
-        """
-        self.__create_org_add_member()
-
-        # /remove_member API call
-        response = self.client.post(org_leave_uri)
-        content = response.json()
-        msg = (response, content)
-        exc = Membership.OwnerCantLeaveException
-
-        # assert API response
-        self.assertEqual(exc.status_code, response.status_code, msg=msg)
-        self.assertIn(exc.default_detail, content["errors"], msg=msg)
-
-    def test_invite_201(self):
-        # create org
-        org = Organization.create(name="testorg", owner=self.user1)
-        self.user1.refresh_from_db()
-
+    def test_error_org_deletion(self):
+        """Members of an org without owner role or user without an org cannot delete the org"""
+        # admin user
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.delete(org_uri)
+        self.assertEqual(403, response.status_code)
         self.assertEqual(
-            0, self.user2.invitations.count(), msg="currently user2 has no invitations"
+            "You do not have permission to perform this action.",
+            response.json()["detail"],
         )
+        # common user
+        self.client.force_authenticate(self.user_common_org_1)
+        response = self.client.delete(org_uri)
+        self.assertEqual(403, response.status_code)
+        self.assertEqual(
+            "You do not have permission to perform this action.",
+            response.json()["detail"],
+        )
+        # user no org
+        self.client.force_authenticate(self.user_no_org)
+        response = self.client.delete(org_uri)
+        self.assertEqual(404, response.status_code)
+        self.assertCountEqual(response.json()["errors"], {"organization": "Not found."})
 
-        # invite user2
-        response, content = self.__send_invite(self.user2.get_username())
-        msg = (response, content)
+    def test_correct_leave_org(self):
+        """Members of org without owner role can leave the org"""
+        # admin user
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(org_leave_uri)
+        self.assertEqual(204, response.status_code)
+        # common user
+        self.client.force_authenticate(self.user_common_org_1)
+        response = self.client.post(org_leave_uri)
+        self.assertEqual(204, response.status_code)
 
-        # asserts
-        self.assertEqual(201, response.status_code, msg=msg)
+    def test_error_leave_org(self):
+        """Owner of an org or user without membership of an org cannot leave an org"""
+        # owner user
+        self.client.force_authenticate(self.user_owner_org_1)
+        response = self.client.post(org_leave_uri)
+        self.assertEqual(400, response.status_code)
+        self.assertIn(
+            "Owner cannot leave the organization but can choose to delete the organization.",
+            response.json()["errors"],
+        )
+        # no org user
+        self.client.force_authenticate(self.user_no_org)
+        response = self.client.post(org_leave_uri)
+        self.assertEqual(404, response.status_code)
+        self.assertCountEqual(response.json()["errors"], {"organization": "Not found."})
 
-        # user2 should have one invitation
-        self.assertEqual(1, self.user2.invitations.count(), msg=msg)
-        self.assertEqual(org, self.user2.invitations.first().organization, msg=msg)
+    def test_correct_remove_user_from_org(self):
+        """Only users with admin or owner roles can remove users from their org"""
+        # owner remove a user
+        self.client.force_authenticate(self.user_owner_org_1)
+        response = self.client.post(
+            org_remove_member_uri, {"username": self.user_admin2_org_1.username}
+        )
+        self.assertEqual(204, response.status_code)
+        # admin remove a user
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(
+            org_remove_member_uri, {"username": self.user_common_org_1.username}
+        )
+        self.assertEqual(204, response.status_code)
 
-    def test_invite_400_invalid_username(self):
-        # create org
-        _ = Organization.create(name="testorg", owner=self.user1)
-        self.user1.refresh_from_db()
+    def test_error_remove_user_from_org(self):
+        """
+        1 - common user cannot remove users (owner, admin or other user)
+        2 - admin cannot remove neither the owner nor other admin
+        3 - request without a username
+        4 - request with a username not existing
+        5 - request with a valid username, but it's not a member
+        6 - request with a valid username and member of another org
+        7 - user with no org
+        """
+        # 1 - common user cannot remove users (owner, admin or other user)
+        self.client.force_authenticate(self.user_common_org_1)
+        response = self.client.post(
+            org_remove_member_uri, {"username": self.user_owner_org_1.username}
+        )
+        self.assertEqual(403, response.status_code)
+        response = self.client.post(
+            org_remove_member_uri, {"username": self.user_admin_org_1.username}
+        )
+        self.assertEqual(403, response.status_code)
+        response = self.client.post(
+            org_remove_member_uri, {"username": self.user_common2_org_1.username}
+        )
+        self.assertEqual(403, response.status_code)
+        # 2 - admin cannot remove neither the owner nor other admin
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(
+            org_remove_member_uri, {"username": self.user_owner_org_1.username}
+        )
+        self.assertEqual(403, response.status_code)
+        self.assertEqual("Cannot remove organization owner.", response.json()["detail"])
+        response = self.client.post(
+            org_remove_member_uri, {"username": self.user_admin2_org_1.username}
+        )
+        self.assertEqual(403, response.status_code)
+        self.assertEqual("Cannot remove another admin.", response.json()["detail"])
+        # 3 - request without a username
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(org_remove_member_uri, {"username": ""})
+        self.assertEqual(400, response.status_code)
+        self.assertIn("'username' is required.", response.json()["errors"])
+        # 4 - request with a username not existing
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(
+            org_remove_member_uri, {"username": "not_existing_user"}
+        )
+        self.assertEqual(400, response.status_code)
+        self.assertIn("No such member.", response.json()["errors"])
+        # 5 - request with a valid username, but it's not a member
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(
+            org_remove_member_uri, {"username": self.user_no_org.username}
+        )
+        self.assertEqual(400, response.status_code)
+        self.assertIn("No such member.", response.json()["errors"])
+        # 6 - request with a valid username and member of another org
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(
+            org_remove_member_uri, {"username": self.user_common_org_2.username}
+        )
+        self.assertEqual(400, response.status_code)
+        self.assertIn("No such member.", response.json()["errors"])
+        # 7 - user with no org
+        self.client.force_authenticate(self.user_no_org)
+        response = self.client.post(
+            org_remove_member_uri, {"username": self.user_common_org_2.username}
+        )
+        self.assertEqual(404, response.status_code)
 
-        # invite an invalid username
-        response, content = self.__send_invite("blahblahblah")
-        msg = (response, content)
+    def test_correct_invite(self):
+        """Owner and admins can invite users"""
+        # owner can invite
+        self.client.force_authenticate(self.user_owner_org_2)
+        response = self.client.post(org_invite_uri, {"username": self.user_no_org})
+        self.assertEqual(201, response.status_code)
+        Invitation.objects.get(user=self.user_no_org, organization=self.org_2).delete()
+        self.client.force_authenticate(self.user_owner_org_2)
+        response = self.client.post(org_invite_uri, {"username": self.user_no_org})
+        self.assertEqual(201, response.status_code)
 
-        # asserts
-        self.assertEqual(400, response.status_code, msg=msg)
-        self.assertIn("Failed", content["errors"]["detail"], msg=msg)
-
-    def test_invite_400_cant_invite_owner(self):
-        # create org
-        _ = Organization.create(name="testorg", owner=self.user1)
-        self.user1.refresh_from_db()
-
-        # invite self user
-        response, content = self.__send_invite(self.user1.get_username())
-        msg = (response, content)
-        exc = Invitation.OwnerException
-
-        # asserts
-        self.assertEqual(exc.status_code, response.status_code, msg=msg)
-        self.assertIn(exc.default_detail, content["errors"], msg=msg)
-
-    def test_invite_400_existing_member(self):
-        # create org and add member
-        self.__create_org_add_member()
-
-        # invite user2
-        response, content = self.__send_invite(self.user2.get_username())
-        msg = (response, content)
-        exc = Invitation.InviteFailedException
-
-        # asserts
-        self.assertEqual(exc.status_code, response.status_code, msg=msg)
-        self.assertIn(exc.default_detail, content["errors"], msg=msg)
-
-    def test_invite_400_already_pending(self):
-        # create org
-        _ = Organization.create(name="testorg", owner=self.user1)
-        self.user1.refresh_from_db()
-
-        # invite user 2
-        response, content = self.__send_invite(self.user2.get_username())
-        self.assertEqual(201, response.status_code, msg=(response, content))
-        # invite user2 again
-        response, content = self.__send_invite(self.user2.get_username())
-        msg = (response, content)
-        exc = Invitation.InviteFailedException
-
-        # asserts
-        self.assertEqual(exc.status_code, response.status_code, msg=msg)
-        self.assertIn(exc.default_detail, content["errors"], msg=msg)
-
-    def test_invite_400_too_many_members(self):
-        # forcing 1 member max
-        Organization.MAX_MEMBERS = 1
-        # create org
-        _ = Organization.create(name="testorg", owner=self.user1)
-        self.user1.refresh_from_db()
-        # invite user 2
-        response, content = self.__send_invite(self.user2.get_username())
-        exc = Invitation.MaxMemberException
-        msg = (response, content)
-        self.assertEqual(exc.status_code, response.status_code, msg=msg)
-        self.assertIn(exc.default_detail, content["errors"], msg=msg)
-        Organization.MAX_MEMBERS = 3
-
-    def test_remove_member_204(self):
-        self.__create_org_add_member()
-
-        # /remove_member API call
-        response = self.__remove_member(self.user2.get_username())
-
-        # assert API response
-        self.assertEqual(204, response.status_code, msg=response)
-
-    def test_remove_member_400_no_username(self):
-        self.__create_org_add_member()
-
-        # /remove_member API call
-        response = self.client.post(org_remove_member_uri)
-        content = response.json()
-        msg = (response, content)
-
-        # assert API response
-        self.assertEqual(400, response.status_code, msg=msg)
-
-    def test_remove_member_400_cant_remove_owner(self):
-        self.__create_org_add_member()
-
-        # /remove_member API call
-        response = self.__remove_member(self.user1.get_username())
-        content = response.json()
-        msg = (response, content)
-
-        # assert API response
-        self.assertEqual(400, response.status_code, msg=msg)
-
-    def test_remove_member_400_no_such_member(self):
-        self.__create_org_add_member()
-
-        # /remove_member API call
-        response = self.__remove_member("blahblahblah")
-        content = response.json()
-        msg = (response, content)
-
-        # assert API response
-        self.assertEqual(400, response.status_code, msg=msg)
-        self.assertIn("No such member.", content["errors"], msg=msg)
-
-    # UTILITY METHODS
-
-    def __create_org_add_member(self):
-        # create org
-        org = Organization.create(name="testorg", owner=self.user1)
-
-        # add user2 as member
-        self.assertFalse(self.user2.has_membership(), msg="user2 has no membership")
-        Membership.objects.create(user=self.user2, organization=org)
-        self.assertTrue(self.user2.has_membership(), msg="user2 now has membership")
-
-        return org
-
-    def __send_invite(self, username):
-        resp = self.client.post(org_invite_uri, {"username": username})
-        return resp, resp.json()
-
-    def __remove_member(self, username):
-        return self.client.post(org_remove_member_uri, {"username": username})
+    def test_error_invite(self):
+        """
+        1 - Cannot invite member
+        2 - Common user cannot invite members
+        3 - Cannot invite without username nor blank
+        4 - Cannot invite not existing username
+        5 - Cannot invite if an invite is already pending
+        6 - Cannot invite if max member number is reached
+        7 - cannot invite if no member of org
+        """
+        # 1 - Cannot invite member
+        self.client.force_authenticate(self.user_owner_org_2)
+        response = self.client.post(
+            org_invite_uri, {"username": self.user_common_org_2}
+        )
+        self.assertEqual(400, response.status_code)
+        self.assertIn("Invite failed.", response.json()["errors"])
+        # 2 - Common user cannot invite members
+        self.client.force_authenticate(self.user_common_org_2)
+        response = self.client.post(org_invite_uri, {"username": self.user_no_org})
+        self.assertEqual(403, response.status_code)
+        # 3 - Cannot invite without username
+        self.client.force_authenticate(self.user_owner_org_2)
+        response = self.client.post(org_invite_uri)
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(
+            {"username": ["This field is required."]}, response.json()["errors"]
+        )
+        response = self.client.post(org_invite_uri, {"username": ""})
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(
+            {"username": ["This field may not be blank."]}, response.json()["errors"]
+        )
+        # 4 - Cannot invite not existing username
+        self.client.force_authenticate(self.user_owner_org_2)
+        response = self.client.post(org_invite_uri, {"username": "not_existing_user"})
+        self.assertEqual(400, response.status_code)
+        self.assertEqual({"detail": "Failed"}, response.json()["errors"])
+        # 5 - Cannot invite if an invitation is already pending
+        with transaction.atomic():
+            self.client.force_authenticate(self.user_owner_org_2)
+            response = self.client.post(
+                org_invite_uri, {"username": self.user_invited.username}
+            )
+            self.assertEqual(400, response.status_code)
+            self.assertIn("Invite failed.", response.json()["errors"])
+        # 6 - Cannot invite if max member number is reached
+        self.client.force_authenticate(self.user_owner_org_1)
+        response = self.client.post(
+            org_invite_uri, {"username": self.user_no_org.username}
+        )
+        self.assertEqual(400, response.status_code)
+        self.assertIn(
+            Invitation.MaxMemberException.default_detail, response.json()["errors"]
+        )
+        # 7 - cannot invite if no member of org
+        self.client.force_authenticate(self.user_no_org)
+        response = self.client.post(
+            org_invite_uri, {"username": self.user_owner_org_1.username}
+        )
+        self.assertEqual(404, response.status_code)

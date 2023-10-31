@@ -4,7 +4,7 @@ from django.db.models import Prefetch
 from rest_flex_fields import is_expanded
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -15,6 +15,7 @@ from .membership import Membership
 from .organization import Organization
 from .permissions import (
     InvitationDestroyObjectPermission,
+    IsObjectAdminPermission,
     IsObjectOwnerPermission,
     IsObjectSameOrgPermission,
 )
@@ -61,7 +62,7 @@ class OrganizationViewSet(GenericViewSet):
         if self.request.method.lower() in ["delete"]:
             permissions.append(IsObjectOwnerPermission())
         elif self.action in ["invite", "remove_member"]:
-            permissions.append(IsObjectOwnerPermission())
+            permissions.append(IsObjectAdminPermission())
         elif self.action in ["list", "retrieve", "leave"]:
             permissions.append(IsObjectSameOrgPermission())
         return permissions
@@ -99,7 +100,7 @@ class OrganizationViewSet(GenericViewSet):
     @action(detail=False, methods=["POST"])
     def invite(self, request, *args, **kwargs):
         """
-        Invite user to organization (accessible only to the organization owner).
+        Invite user to organization (accessible only to the organization admin).
 
         ``POST ~/organization/invite``.
         """
@@ -120,22 +121,33 @@ class OrganizationViewSet(GenericViewSet):
     @action(detail=False, methods=["POST"])
     def remove_member(self, request, *args, **kwargs):
         """
-        Remove user's membership from organization (accessible only to the organization owner).
+        Remove user's membership from organization (accessible only to the organization admin).
 
         ``POST ~/organization/remove_member``.
         """
-        username = request.data.get("username", None)
-        logger.info(f"remove member {username} from user {request.user}")
-        if not username:
+        username_to_remove = request.data.get("username", None)
+        logger.info(f"remove member {username_to_remove} from user {request.user}")
+        if not username_to_remove:
             raise ValidationError("'username' is required.")
         org = self.get_object()
         try:
-            membership = org.members.get(user__username=username)
-            if membership.is_owner:
-                raise ValidationError("Cannot remove organization owner.")
+            membership_request_user = org.members.get(user__username=request.user)
+            membership_user_to_remove = org.members.get(
+                user__username=username_to_remove
+            )
+            if membership_user_to_remove.is_owner:
+                raise PermissionDenied(
+                    detail="Cannot remove organization owner.", code=403
+                )
+            # only the owner can remove the admin
+            if (
+                not membership_request_user.is_owner
+                and membership_user_to_remove.is_admin
+            ):
+                raise PermissionDenied(detail="Cannot remove another admin.", code=403)
         except Membership.DoesNotExist:
             raise ValidationError("No such member.")
-        membership.delete()
+        membership_user_to_remove.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=["POST"])
@@ -146,7 +158,11 @@ class OrganizationViewSet(GenericViewSet):
         ``POST ~/organization/leave``.
         """
         logger.info(f"leave membership org from user {request.user}")
-        if request.user.membership.is_owner:
+        try:
+            membership = request.user.membership
+        except Membership.DoesNotExist:
+            raise NotFound()
+        if membership.is_owner:
             raise Membership.OwnerCantLeaveException()
         request.user.membership.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

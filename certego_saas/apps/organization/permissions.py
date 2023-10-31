@@ -1,5 +1,7 @@
 from rest_framework.permissions import BasePermission
 
+from .invitation import Invitation
+from .membership import Membership
 from .organization import Organization
 
 
@@ -11,12 +13,17 @@ class InvitationDestroyObjectPermission(BasePermission):
 
     message = "Invitation was previously accepted or declined so cannot be deleted."
 
-    def has_object_permission(self, request, view, obj):
+    def has_object_permission(self, request, view, obj: Invitation):
         is_pending = obj.is_pending()
-        if not is_pending:
+        try:
+            Membership.objects.get(
+                user__username=request.user,
+                organization=obj.organization,
+                is_admin=True,
+            )
+        except Membership.DoesNotExist:
             return False
-        is_authuser_org_owner = obj.organization.owner.pk == request.user.pk
-        return is_pending and is_authuser_org_owner
+        return is_pending
 
 
 class IsObjectOwnerPermission(BasePermission):
@@ -26,6 +33,16 @@ class IsObjectOwnerPermission(BasePermission):
         if obj_owner := getattr(obj, "user", None):
             return obj_owner == request.user
         return False
+
+
+class IsObjectAdminPermission(BasePermission):
+    def has_object_permission(self, request, view, obj: Organization):
+        try:
+            return Membership.objects.get(
+                user__username=request.user, organization=obj, is_admin=True
+            )
+        except Membership.DoesNotExist:
+            return False
 
 
 class IsObjectSameOrgPermission(BasePermission):

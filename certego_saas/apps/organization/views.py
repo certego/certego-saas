@@ -4,7 +4,7 @@ from django.db.models import Prefetch
 from rest_flex_fields import is_expanded
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -15,8 +15,9 @@ from .membership import Membership
 from .organization import Organization
 from .permissions import (
     InvitationDestroyObjectPermission,
+    IsObjectAdminPermission,
     IsObjectOwnerPermission,
-    IsObjectSameOrgPermission, IsObjectAdminPermission,
+    IsObjectSameOrgPermission,
 )
 from .serializers import (
     InvitationsListSerializer,
@@ -131,11 +132,18 @@ class OrganizationViewSet(GenericViewSet):
         org = self.get_object()
         try:
             membership_request_user = org.members.get(user__username=request.user)
-            membership_user_to_remove = org.members.get(user__username=username_to_remove)
+            membership_user_to_remove = org.members.get(
+                user__username=username_to_remove
+            )
             if membership_user_to_remove.is_owner:
-                raise PermissionDenied(detail="Cannot remove organization owner.", code=403)
+                raise PermissionDenied(
+                    detail="Cannot remove organization owner.", code=403
+                )
             # only the owner can remove the admin
-            if not membership_request_user.is_owner and membership_user_to_remove.is_admin:
+            if (
+                not membership_request_user.is_owner
+                and membership_user_to_remove.is_admin
+            ):
                 raise PermissionDenied(detail="Cannot remove another admin.", code=403)
         except Membership.DoesNotExist:
             raise ValidationError("No such member.")

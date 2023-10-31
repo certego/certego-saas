@@ -16,7 +16,11 @@ class InvitationDestroyObjectPermission(BasePermission):
     def has_object_permission(self, request, view, obj: Invitation):
         is_pending = obj.is_pending()
         try:
-            Membership.objects.get(user__username=request.user, organization=obj.organization, is_admin=True)
+            Membership.objects.get(
+                user__username=request.user,
+                organization=obj.organization,
+                is_admin=True,
+            )
         except Membership.DoesNotExist:
             return False
         return is_pending
@@ -34,7 +38,9 @@ class IsObjectOwnerPermission(BasePermission):
 class IsObjectAdminPermission(BasePermission):
     def has_object_permission(self, request, view, obj: Organization):
         try:
-            return Membership.objects.get(user__username=request.user, organization=obj, is_admin=True)
+            return Membership.objects.get(
+                user__username=request.user, organization=obj, is_admin=True
+            )
         except Membership.DoesNotExist:
             return False
 

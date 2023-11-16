@@ -45,7 +45,7 @@ class __BIDocumentInterface:
         qs = cls.objects
         if index:
             qs.filter(index=index)
-        docs = qs.order_by("+time")
+        docs = qs.order_by("+creation_date")
         if max_number:
             docs = docs[:max_number]
         logger.info(f"Uploading {docs.count()} documents")
@@ -80,14 +80,7 @@ except ImportError:
         kwargs = JSONField()
 
         class Meta:
-            indexes = [
-                Index(
-                    fields=[
-                        "index",
-                        "time",
-                    ]
-                )
-            ]
+            indexes = [Index(fields=["index", "creation_date"])]
 
 else:
 
@@ -99,4 +92,4 @@ else:
         category = mongo_fields.StringField(required=True)
         count = mongo_fields.IntField(required=True, min_value=0)
         kwargs = mongo_fields.DictField(required=False)
-        meta = {"indexes": ["index", "time"]}
+        meta = {"indexes": ["index", "creation_date"]}

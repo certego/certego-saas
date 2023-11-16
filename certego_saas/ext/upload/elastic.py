@@ -51,7 +51,8 @@ class __BIDocumentInterface:
         logger.info(f"Uploading {docs.count()} documents")
         jsons = map(lambda x: x.to_bulk(), docs)
         success, errors = bulk(client, jsons, request_timeout=timeout)
-        docs.delete()
+        for doc in docs.iterator():
+            doc.delete()
         return success, errors
 
     def clean(self):
@@ -68,7 +69,7 @@ try:
     from mongoengine import fields as mongo_fields
 
 except ImportError:
-    from django.db.models import JSONField, Model
+    from django.db.models import Index, JSONField, Model
     from django.db.models import fields as django_fields
 
     class BIDocument(__BIDocumentInterface, Model):
@@ -77,6 +78,16 @@ except ImportError:
         category = django_fields.CharField(max_length=100)
         count = django_fields.PositiveIntegerField()
         kwargs = JSONField()
+
+        class Meta:
+            indexes = [
+                Index(
+                    fields=[
+                        "index",
+                        "time",
+                    ]
+                )
+            ]
 
 else:
 
@@ -88,3 +99,4 @@ else:
         category = mongo_fields.StringField(required=True)
         count = mongo_fields.IntField(required=True, min_value=0)
         kwargs = mongo_fields.DictField(required=False)
+        meta = {"indexes": ["index", "time"]}

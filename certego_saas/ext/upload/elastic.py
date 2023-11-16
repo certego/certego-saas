@@ -51,7 +51,7 @@ class __BIDocumentInterface:
         logger.info(f"Uploading {docs.count()} documents")
         jsons = map(lambda x: x.to_bulk(), docs)
         success, errors = bulk(client, jsons, request_timeout=timeout)
-        for doc in docs:
+        for doc in docs.iterator():
             doc.delete()
         return success, errors
 

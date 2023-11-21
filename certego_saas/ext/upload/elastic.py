@@ -80,7 +80,7 @@ except ImportError:
         kwargs = JSONField()
 
         class Meta:
-            indexes = [Index(fields=["index", "creation_date"])]
+            indexes = [Index(fields=["index"]), Index(fields=["creation_date"])]
 
 else:
 

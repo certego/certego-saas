@@ -11,6 +11,8 @@ org_uri = reverse("user_organization-list")
 org_leave_uri = reverse("user_organization-leave")
 org_invite_uri = reverse("user_organization-invite")
 org_remove_member_uri = reverse("user_organization-remove-member")
+org_remove_admin_uri = reverse("user_organization-remove-admin")
+org_promote_admin_uri = reverse("user_organization-promote-admin")
 
 
 @tag("apps", "organization")
@@ -355,5 +357,151 @@ class TestOrganization(CustomTestCase):
         self.client.force_authenticate(self.user_no_org)
         response = self.client.post(
             org_invite_uri, {"username": self.user_owner_org_1.username}
+        )
+        self.assertEqual(404, response.status_code)
+    
+    def test_correct_remove_admin_from_org(self):
+        """Only owner can remove user as admin from their org"""
+        self.client.force_authenticate(self.user_owner_org_1)
+        response = self.client.post(
+            org_remove_admin_uri, {"username": self.user_admin2_org_1.username}
+        )
+        self.assertEqual(204, response.status_code)
+    
+    def test_error_remove_admin_from_org(self):
+        """
+        1 - common user cannot remove admins
+        2 - an admin cannot remove other admin
+        3 - request without a username
+        4 - request with a username not existing
+        5 - request with a valid username, but it's not a member
+        6 - request with a valid username and member of another org
+        7 - user with no org
+        """
+        # 1 - common user cannot remove admin
+        self.client.force_authenticate(self.user_common_org_1)
+        response = self.client.post(
+            org_remove_admin_uri, {"username": self.user_owner_org_1.username}
+        )
+        self.assertEqual(403, response.status_code)
+        response = self.client.post(
+            org_remove_admin_uri, {"username": self.user_admin_org_1.username}
+        )
+        self.assertEqual(403, response.status_code)
+        # 2 - an admin cannot remove other admin
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(
+            org_remove_admin_uri, {"username": self.user_owner_org_1.username}
+        )
+        self.assertEqual(403, response.status_code)
+        self.assertEqual("Cannot remove organization owner.", response.json()["detail"])
+        response = self.client.post(
+            org_remove_admin_uri, {"username": self.user_admin2_org_1.username}
+        )
+        self.assertEqual(403, response.status_code)
+        self.assertEqual("You are not the owner of the org", response.json()["detail"])
+        # 3 - request without a username
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(org_remove_admin_uri, {"username": ""})
+        self.assertEqual(400, response.status_code)
+        self.assertIn("'username' is required.", response.json()["errors"])
+        # 4 - request with a username not existing
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(
+            org_remove_admin_uri, {"username": "not_existing_user"}
+        )
+        self.assertEqual(400, response.status_code)
+        self.assertIn("No such member.", response.json()["errors"])
+        # 5 - request with a valid username, but it's not a member
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(
+            org_remove_admin_uri, {"username": self.user_no_org.username}
+        )
+        self.assertEqual(400, response.status_code)
+        self.assertIn("No such member.", response.json()["errors"])
+        # 6 - request with a valid username and member of another org
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(
+            org_remove_admin_uri, {"username": self.user_common_org_2.username}
+        )
+        self.assertEqual(400, response.status_code)
+        self.assertIn("No such member.", response.json()["errors"])
+        # 7 - user with no org
+        self.client.force_authenticate(self.user_no_org)
+        response = self.client.post(
+            org_remove_admin_uri, {"username": self.user_common_org_2.username}
+        )
+        self.assertEqual(404, response.status_code)
+    
+    def test_correct_promote_admin_from_org(self):
+        """Only owner can promote user as admin from their org"""
+        self.client.force_authenticate(self.user_owner_org_1)
+        response = self.client.post(
+            org_promote_admin_uri, {"username": self.user_common_org_1.username}
+        )
+        self.assertEqual(200, response.status_code)
+        
+    def test_error_promote_admin_from_org(self):
+        """
+        1 - common user cannot promote admins
+        2 - an admin cannot promote other admin
+        3 - request without a username
+        4 - request with a username not existing
+        5 - request with a valid username, but it's not a member
+        6 - request with a valid username and member of another org
+        7 - user with no org
+        """
+        # 1 - common user cannot promote admin
+        self.client.force_authenticate(self.user_common_org_1)
+        response = self.client.post(
+            org_promote_admin_uri, {"username": self.user_owner_org_1.username}
+        )
+        self.assertEqual(403, response.status_code)
+        response = self.client.post(
+            org_promote_admin_uri, {"username": self.user_admin_org_1.username}
+        )
+        self.assertEqual(403, response.status_code)
+        # 2 - an admin cannot promote other admin
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(
+            org_promote_admin_uri, {"username": self.user_owner_org_1.username}
+        )
+        self.assertEqual(403, response.status_code)
+        self.assertEqual("Owner is already an admin.", response.json()["detail"])
+        response = self.client.post(
+            org_promote_admin_uri, {"username": self.user_admin2_org_1.username}
+        )
+        self.assertEqual(403, response.status_code)
+        self.assertEqual("You are not the owner of the org", response.json()["detail"])
+        # 3 - request without a username
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(org_promote_admin_uri, {"username": ""})
+        self.assertEqual(400, response.status_code)
+        self.assertIn("'username' is required.", response.json()["errors"])
+        # 4 - request with a username not existing
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(
+            org_promote_admin_uri, {"username": "not_existing_user"}
+        )
+        self.assertEqual(400, response.status_code)
+        self.assertIn("No such member.", response.json()["errors"])
+        # 5 - request with a valid username, but it's not a member
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(
+            org_promote_admin_uri, {"username": self.user_no_org.username}
+        )
+        self.assertEqual(400, response.status_code)
+        self.assertIn("No such member.", response.json()["errors"])
+        # 6 - request with a valid username and member of another org
+        self.client.force_authenticate(self.user_admin_org_1)
+        response = self.client.post(
+            org_promote_admin_uri, {"username": self.user_common_org_2.username}
+        )
+        self.assertEqual(400, response.status_code)
+        self.assertIn("No such member.", response.json()["errors"])
+        # 7 - user with no org
+        self.client.force_authenticate(self.user_no_org)
+        response = self.client.post(
+            org_promote_admin_uri, {"username": self.user_common_org_2.username}
         )
         self.assertEqual(404, response.status_code)

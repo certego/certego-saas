@@ -166,6 +166,70 @@ class OrganizationViewSet(GenericViewSet):
             raise Membership.OwnerCantLeaveException()
         request.user.membership.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @action(detail=False, methods=["POST"])
+    def promote_admin(self, request, *args, **kwargs):
+        """
+        Promote user as an admin of the org
+
+        ``POST ~/organization/promote_admin``.
+        """
+        username_to_promote = request.data.get("username", None)
+        logger.info(f"promote {username_to_promote} as admin from user {request.user}")
+        if not username_to_promote:
+            raise ValidationError("'username' is required.")
+        org = self.get_object()
+        try:
+            membership_request_user = org.members.get(user__username=request.user)
+            logger.info(f"membership_request_user: {membership_request_user}")
+            membership_user_to_promote = org.members.get(
+                user__username=username_to_promote
+            )
+            logger.info(f"membership_user_to_promote: {membership_user_to_promote}")
+            if membership_user_to_promote.is_owner:
+                raise PermissionDenied(
+                    detail="Owner is already an admin.", code=403
+                )
+            # only the owner can promote the user an admin
+            if not membership_request_user.is_owner:
+                raise PermissionDenied(detail="You are not the owner of the org", code=403)
+        except Membership.DoesNotExist:
+            raise ValidationError("No such member.")
+        membership_user_to_promote.is_admin = True
+        membership_user_to_promote.save()
+        return Response(status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=["POST"])
+    def remove_admin(self, request, *args, **kwargs):
+        """
+        Remove user as admin of the org
+
+        ``POST ~/organization/remove_admin``.
+        """
+        username_to_remove = request.data.get("username", None)
+        logger.info(f"remove {username_to_remove} as admin from user {request.user}")
+        if not username_to_remove:
+            raise ValidationError("'username' is required.")
+        org = self.get_object()
+        try:
+            membership_request_user = org.members.get(user__username=request.user)
+            logger.info(f"membership_request_user: {membership_request_user}")
+            membership_user_to_remove = org.members.get(
+                user__username=username_to_remove
+            )
+            logger.info(f"membership_user_to_promote: {membership_user_to_remove}")
+            if membership_user_to_remove.is_owner:
+                raise PermissionDenied(
+                    detail="Cannot remove organization owner.", code=403
+                )
+            # only the owner can promote the user an admin
+            if not membership_request_user.is_owner:
+                raise PermissionDenied(detail="You are not the owner of the org", code=403)
+        except Membership.DoesNotExist:
+            raise ValidationError("No such member.")
+        membership_user_to_remove.is_admin = False
+        membership_user_to_remove.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class InvitationViewSet(ListAndDeleteOnlyViewSet):

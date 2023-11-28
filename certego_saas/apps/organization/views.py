@@ -20,10 +20,10 @@ from .permissions import (
     IsObjectSameOrgPermission,
 )
 from .serializers import (
+    AdminActionsSerializer,
     InvitationsListSerializer,
     InviteCreateSerializer,
     OrganizationSerializer,
-    AdminActionsSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -167,35 +167,45 @@ class OrganizationViewSet(GenericViewSet):
             raise Membership.OwnerCantLeaveException()
         request.user.membership.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
     @action(detail=False, methods=["POST"])
     def promote_admin(self, request, *args, **kwargs):
         """
         Promote user as an admin of the org
 
-        ``POST ~/organization/promote_admin``.
+        ``POST ~/organization/promote_admin``
         """
         username_to_promote = request.data.get("username", None)
         logger.info(f"promote {username_to_promote} as admin from user {request.user}")
         org = self.get_object()
-        serializer = AdminActionsSerializer(data={"username": username_to_promote, "request_user_username": request.user.username})
+        serializer = AdminActionsSerializer(
+            data={
+                "username": username_to_promote,
+                "request_user_username": request.user.username,
+            }
+        )
         serializer.is_valid(raise_exception=True)
         membership_user_to_promote = org.members.get(user__username=username_to_promote)
         membership_user_to_promote.is_admin = True
         membership_user_to_promote.save()
         return Response(status=status.HTTP_200_OK)
-    
+
     @action(detail=False, methods=["POST"])
     def remove_admin(self, request, *args, **kwargs):
         """
         Remove user as admin of the org
 
-        ``POST ~/organization/remove_admin``.
+        ``POST ~/organization/remove_admin``
         """
         username_to_remove = request.data.get("username", None)
         logger.info(f"remove {username_to_remove} as admin from user {request.user}")
         org = self.get_object()
-        serializer = AdminActionsSerializer(data={"username": username_to_remove, "request_user_username": request.user.username})
+        serializer = AdminActionsSerializer(
+            data={
+                "username": username_to_remove,
+                "request_user_username": request.user.username,
+            }
+        )
         serializer.is_valid(raise_exception=True)
         membership_user_to_remove = org.members.get(user__username=username_to_remove)
         membership_user_to_remove.is_admin = False

@@ -23,6 +23,7 @@ from .serializers import (
     InvitationsListSerializer,
     InviteCreateSerializer,
     OrganizationSerializer,
+    AdminActionsSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -176,25 +177,10 @@ class OrganizationViewSet(GenericViewSet):
         """
         username_to_promote = request.data.get("username", None)
         logger.info(f"promote {username_to_promote} as admin from user {request.user}")
-        if not username_to_promote:
-            raise ValidationError("'username' is required.")
         org = self.get_object()
-        try:
-            membership_request_user = org.members.get(user__username=request.user)
-            logger.info(f"membership_request_user: {membership_request_user}")
-            membership_user_to_promote = org.members.get(
-                user__username=username_to_promote
-            )
-            logger.info(f"membership_user_to_promote: {membership_user_to_promote}")
-            if membership_user_to_promote.is_owner:
-                raise PermissionDenied(
-                    detail="Owner is already an admin.", code=403
-                )
-            # only the owner can promote the user an admin
-            if not membership_request_user.is_owner:
-                raise PermissionDenied(detail="You are not the owner of the org", code=403)
-        except Membership.DoesNotExist:
-            raise ValidationError("No such member.")
+        serializer = AdminActionsSerializer(data={"username": username_to_promote, "request_user_username": request.user.username})
+        serializer.is_valid(raise_exception=True)
+        membership_user_to_promote = org.members.get(user__username=username_to_promote)
         membership_user_to_promote.is_admin = True
         membership_user_to_promote.save()
         return Response(status=status.HTTP_200_OK)
@@ -208,25 +194,10 @@ class OrganizationViewSet(GenericViewSet):
         """
         username_to_remove = request.data.get("username", None)
         logger.info(f"remove {username_to_remove} as admin from user {request.user}")
-        if not username_to_remove:
-            raise ValidationError("'username' is required.")
         org = self.get_object()
-        try:
-            membership_request_user = org.members.get(user__username=request.user)
-            logger.info(f"membership_request_user: {membership_request_user}")
-            membership_user_to_remove = org.members.get(
-                user__username=username_to_remove
-            )
-            logger.info(f"membership_user_to_promote: {membership_user_to_remove}")
-            if membership_user_to_remove.is_owner:
-                raise PermissionDenied(
-                    detail="Cannot remove organization owner.", code=403
-                )
-            # only the owner can promote the user an admin
-            if not membership_request_user.is_owner:
-                raise PermissionDenied(detail="You are not the owner of the org", code=403)
-        except Membership.DoesNotExist:
-            raise ValidationError("No such member.")
+        serializer = AdminActionsSerializer(data={"username": username_to_remove, "request_user_username": request.user.username})
+        serializer.is_valid(raise_exception=True)
+        membership_user_to_remove = org.members.get(user__username=username_to_remove)
         membership_user_to_remove.is_admin = False
         membership_user_to_remove.save()
         return Response(status=status.HTTP_204_NO_CONTENT)

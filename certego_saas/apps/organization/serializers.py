@@ -1,5 +1,6 @@
 from rest_flex_fields.serializers import FlexFieldsModelSerializer
 from rest_framework import serializers as rfs
+from rest_framework.exceptions import NotFound, PermissionDenied
 
 from certego_saas.apps.user.models import User
 from certego_saas.apps.user.serializers import UserSerializer
@@ -92,3 +93,40 @@ class InviteCreateSerializer(rfs.Serializer):
             send_email=True,
             request=request,
         )
+
+class AdminActionsSerializer(rfs.Serializer):
+    class Meta:
+        fields = ["username", "request_user_username"]
+
+    username = rfs.CharField()
+    request_user_username = rfs.CharField()
+
+    def validate(self, data): 
+        username = data.get("username")
+        try:
+            request_user = User.objects.get(username=data.get("request_user_username"))
+        except User.DoesNotExist:
+            raise NotFound()
+
+        try:
+            # request_user must have a membership
+            membership_request_user = request_user.membership
+        except Membership.DoesNotExist:
+            raise rfs.ValidationError({'detail': 'You are not a member of any organization.'})
+        
+        try:
+            # user to promote/remove must be a member of request_user organization
+            membership_user = membership_request_user.organization.members.get(
+                user__username=username
+            )
+        except Membership.DoesNotExist:
+            raise rfs.ValidationError({'detail': 'User to promote/remove is not part of your organization.'})
+         
+        if membership_user.is_owner:
+            raise PermissionDenied(
+                detail="You can't modify owner permission", code=403
+            )
+        # only the owner can promote/remove the user as admin
+        if not membership_request_user.is_owner:
+            raise PermissionDenied(detail="You are not the owner of the org", code=403)
+        return data

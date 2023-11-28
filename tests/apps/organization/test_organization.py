@@ -394,7 +394,7 @@ class TestOrganization(CustomTestCase):
             org_remove_admin_uri, {"username": self.user_owner_org_1.username}
         )
         self.assertEqual(403, response.status_code)
-        self.assertEqual("Cannot remove organization owner.", response.json()["detail"])
+        self.assertEqual("You can't modify owner permission", response.json()["detail"])
         response = self.client.post(
             org_remove_admin_uri, {"username": self.user_admin2_org_1.username}
         )
@@ -404,28 +404,28 @@ class TestOrganization(CustomTestCase):
         self.client.force_authenticate(self.user_admin_org_1)
         response = self.client.post(org_remove_admin_uri, {"username": ""})
         self.assertEqual(400, response.status_code)
-        self.assertIn("'username' is required.", response.json()["errors"])
+        self.assertIn("This field may not be blank.", response.json()["errors"]["username"])
         # 4 - request with a username not existing
         self.client.force_authenticate(self.user_admin_org_1)
         response = self.client.post(
             org_remove_admin_uri, {"username": "not_existing_user"}
         )
         self.assertEqual(400, response.status_code)
-        self.assertIn("No such member.", response.json()["errors"])
+        self.assertIn("User to promote/remove is not part of your organization.", response.json()["errors"]["detail"])
         # 5 - request with a valid username, but it's not a member
         self.client.force_authenticate(self.user_admin_org_1)
         response = self.client.post(
             org_remove_admin_uri, {"username": self.user_no_org.username}
         )
         self.assertEqual(400, response.status_code)
-        self.assertIn("No such member.", response.json()["errors"])
+        self.assertIn("User to promote/remove is not part of your organization.", response.json()["errors"]["detail"])
         # 6 - request with a valid username and member of another org
         self.client.force_authenticate(self.user_admin_org_1)
         response = self.client.post(
             org_remove_admin_uri, {"username": self.user_common_org_2.username}
         )
         self.assertEqual(400, response.status_code)
-        self.assertIn("No such member.", response.json()["errors"])
+        self.assertIn("User to promote/remove is not part of your organization.", response.json()["errors"]["detail"])
         # 7 - user with no org
         self.client.force_authenticate(self.user_no_org)
         response = self.client.post(
@@ -467,7 +467,7 @@ class TestOrganization(CustomTestCase):
             org_promote_admin_uri, {"username": self.user_owner_org_1.username}
         )
         self.assertEqual(403, response.status_code)
-        self.assertEqual("Owner is already an admin.", response.json()["detail"])
+        self.assertEqual("You can't modify owner permission", response.json()["detail"])
         response = self.client.post(
             org_promote_admin_uri, {"username": self.user_admin2_org_1.username}
         )
@@ -477,28 +477,28 @@ class TestOrganization(CustomTestCase):
         self.client.force_authenticate(self.user_admin_org_1)
         response = self.client.post(org_promote_admin_uri, {"username": ""})
         self.assertEqual(400, response.status_code)
-        self.assertIn("'username' is required.", response.json()["errors"])
+        self.assertIn("This field may not be blank.", response.json()["errors"]["username"])
         # 4 - request with a username not existing
         self.client.force_authenticate(self.user_admin_org_1)
         response = self.client.post(
             org_promote_admin_uri, {"username": "not_existing_user"}
         )
         self.assertEqual(400, response.status_code)
-        self.assertIn("No such member.", response.json()["errors"])
+        self.assertIn("User to promote/remove is not part of your organization.", response.json()["errors"]["detail"])
         # 5 - request with a valid username, but it's not a member
         self.client.force_authenticate(self.user_admin_org_1)
         response = self.client.post(
             org_promote_admin_uri, {"username": self.user_no_org.username}
         )
         self.assertEqual(400, response.status_code)
-        self.assertIn("No such member.", response.json()["errors"])
+        self.assertIn("User to promote/remove is not part of your organization.", response.json()["errors"]["detail"])
         # 6 - request with a valid username and member of another org
-        self.client.force_authenticate(self.user_admin_org_1)
+        self.client.force_authenticate(self.user_owner_org_1)
         response = self.client.post(
             org_promote_admin_uri, {"username": self.user_common_org_2.username}
         )
         self.assertEqual(400, response.status_code)
-        self.assertIn("No such member.", response.json()["errors"])
+        self.assertIn("User to promote/remove is not part of your organization.", response.json()["errors"]["detail"])
         # 7 - user with no org
         self.client.force_authenticate(self.user_no_org)
         response = self.client.post(

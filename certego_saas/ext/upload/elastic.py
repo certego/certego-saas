@@ -48,11 +48,14 @@ class __BIDocumentInterface:
         docs = qs.order_by("+creation_date")
         if max_number:
             docs = docs[:max_number]
-        logger.info(f"Uploading {docs.count()} documents")
+        num_docs = docs.count()
+        logger.info(f"Uploading {num_docs} documents")
         jsons = map(lambda x: x.to_bulk(), docs)
         success, errors = bulk(client, jsons, request_timeout=timeout)
+        logger.info(f"Finished Upload. Deleting {num_docs} documents")
         for doc in docs.iterator():
             doc.delete()
+        logger.info(f"Finished deleting {num_docs} documents")
         return success, errors
 
     def clean(self):

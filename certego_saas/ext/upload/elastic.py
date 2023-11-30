@@ -47,13 +47,16 @@ class __BIDocumentInterface:
             qs.filter(index=index)
         docs = qs.order_by("+creation_date")
         if max_number:
+            if max_number > 10000:
+                return False, [
+                    "max_number can't be higher than 10000 for performance reasons."
+                ]
             docs = docs[:max_number]
         logger.info(f"Uploading {docs.count()} documents")
         jsons = map(lambda x: x.to_bulk(), docs)
         success, errors = bulk(client, jsons, request_timeout=timeout)
         logger.info("Finished Upload. Starting deletion documents")
-        for doc in docs.iterator():
-            doc.delete()
+        docs.delete()
         logger.info("Finished deleting documents")
         return success, errors
 

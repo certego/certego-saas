@@ -2,6 +2,9 @@
 
 **[Get it on PyPi](https://pypi.org/project/certego-saas/)**
 
+## 0.7.9
+Elastic BI support for v8
+
 ## [0.7.3](https://github.com/certego/certego-saas/releases/tag/0.1.1)
 
 **New features:**

@@ -30,7 +30,6 @@ class __BIDocumentInterface:
         return {
             "_op_type": "index",
             "_index": self.index,
-            "_type": "_doc",
             "_source": self.to_json(),
         }
 

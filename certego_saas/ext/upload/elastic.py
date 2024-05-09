@@ -11,16 +11,17 @@ import elasticsearch
 
 class __BIDocumentInterface:
     index: str
-    creation_date: datetime
-    category: str
-    count: int
+    timestamp: datetime
+    application: str
+    environment: str
+
     kwargs: Dict[str, str]
 
     def to_json(self) -> Dict[str, Any]:
         res = {
-            "timestamp": self.creation_date,
-            "bi_category": self.category,
-            "count": self.count,
+            "timestamp": self.timestamp,
+            "application": self.application,
+            "environment": self.environment,
             **self.kwargs,
         }
         logger.debug(f"Json document: {res}")
@@ -44,7 +45,7 @@ class __BIDocumentInterface:
         qs = cls.objects
         if index:
             qs.filter(index=index)
-        docs = qs.order_by("+creation_date")
+        docs = qs.order_by("+timestamp")
         if max_number:
             if max_number > 10000:
                 return False, [
@@ -65,7 +66,7 @@ class __BIDocumentInterface:
         }
 
     def __repr__(self):
-        return f"|{self.index=}, {self.category=}, {self.count=}, {self.kwargs=}"
+        return f"|{self.index=}, {self.application=}, {self.environment=}, {self.kwargs=}"
 
 
 try:
@@ -78,22 +79,22 @@ except ImportError:
 
     class BIDocument(__BIDocumentInterface, Model):
         index = django_fields.CharField(max_length=100)
-        creation_date = django_fields.DateTimeField(auto_now_add=True)
-        category = django_fields.CharField(max_length=100)
-        count = django_fields.PositiveIntegerField()
+        timestamp = django_fields.DateTimeField(auto_now_add=True)
+        application = django_fields.CharField(max_length=100)
+        environment = django_fields.CharField(max_length=100)
         kwargs = JSONField()
 
         class Meta:
-            indexes = [Index(fields=["index"]), Index(fields=["creation_date"])]
+            indexes = [Index(fields=["index"]), Index(fields=["timestamp"])]
 
 else:
 
     class BIDocument(__BIDocumentInterface, Document):
         index = mongo_fields.StringField(required=True)
-        creation_date = mongo_fields.DateTimeField(
+        timestamp = mongo_fields.DateTimeField(
             required=True, default=datetime.datetime.now
         )
-        category = mongo_fields.StringField(required=True)
-        count = mongo_fields.IntField(required=True, min_value=0)
+        application = mongo_fields.StringField(required=True)
+        environment = mongo_fields.StringField(required=True)
         kwargs = mongo_fields.DictField(required=False)
-        meta = {"indexes": ["index", "creation_date"]}
+        meta = {"indexes": ["index", "timestamp"]}

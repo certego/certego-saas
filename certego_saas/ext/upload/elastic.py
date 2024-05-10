@@ -2,6 +2,7 @@ import datetime
 import logging
 from typing import Any, Dict, Tuple
 
+from django.utils.timezone import now
 from elasticsearch.helpers import bulk
 
 logger = logging.getLogger(__name__)
@@ -30,7 +31,7 @@ class __BIDocumentInterface:
     def to_bulk(self) -> Dict[str, Any]:
         return {
             "_op_type": "index",
-            "_index": self.index,
+            "_index": self.index + "-" + now().strftime("%Y.%m"),
             "_source": self.to_json(),
         }
 

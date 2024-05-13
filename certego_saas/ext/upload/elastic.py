@@ -29,7 +29,7 @@ class AbstractBISerializer(ModelSerializer):
     def to_elastic_dict(data):
         return {
             "_source": data,
-            "_index": hasattr(settings, ELASTICSEARCH_BI_INDEX) + "-" + now().strftime("%Y.%m"),
+            "_index": getattr(settings, "ELASTICSEARCH_BI_INDEX") + "-" + now().strftime("%Y.%m"),
             "_op_type": "index",
         }
 

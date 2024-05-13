@@ -4,11 +4,34 @@ from typing import Any, Dict, Tuple
 
 from django.utils.timezone import now
 from elasticsearch.helpers import bulk
+from rest_framework import serializers as rfs
+from rest_framework.fields import Field
+from rest_framework.serializers import ModelSerializer
 
 logger = logging.getLogger(__name__)
 
 import elasticsearch
 
+
+class AbstractBISerializer(ModelSerializer):
+    application = rfs.CharField(read_only=True)
+    environment = rfs.SerializerMethodField(method_name="get_environment")
+    timestamp: Field
+
+    class Meta:
+        fields = [
+            "application",
+            "environment",
+            "timestamp",
+        ]
+
+    @staticmethod
+    def to_elastic_dict(data):
+        return {
+            "_source": data,
+            "_index": hasattr(settings, ELASTICSEARCH_BI_INDEX) + "-" + now().strftime("%Y.%m"),
+            "_op_type": "index",
+        }
 
 class __BIDocumentInterface:
     index: str
@@ -16,29 +39,11 @@ class __BIDocumentInterface:
     application: str
     environment: str
 
-    kwargs: Dict[str, str]
-
-    def to_json(self) -> Dict[str, Any]:
-        res = {
-            "timestamp": self.timestamp,
-            "application": self.application,
-            "environment": self.environment,
-            **self.kwargs,
-        }
-        logger.debug(f"Json document: {res}")
-        return res
-
-    def to_bulk(self) -> Dict[str, Any]:
-        return {
-            "_op_type": "index",
-            "_index": self.index + "-" + now().strftime("%Y.%m"),
-            "_source": self.to_json(),
-        }
-
     @classmethod
     def upload(
         cls,
         client: elasticsearch.Elasticsearch,
+        serializer: AbstractBISerializer,
         index: str = None,
         timeout: int = 30,
         max_number: int = None,
@@ -54,7 +59,7 @@ class __BIDocumentInterface:
                 ]
             docs = docs[:max_number]
         logger.info(f"Uploading {docs.count()} documents")
-        jsons = map(lambda x: x.to_bulk(), docs)
+        jsons = serializer(instance=docs, many=True)
         success, errors = bulk(client, jsons, request_timeout=timeout)
         logger.info("Finished Upload. Starting deletion documents")
         docs.delete()

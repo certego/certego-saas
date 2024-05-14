@@ -4,10 +4,8 @@ from typing import Tuple
 
 from django.utils.timezone import now
 from elasticsearch.helpers import bulk
-from rest_framework import serializers as rfs
 from rest_framework.fields import Field
 from rest_framework.serializers import ModelSerializer
-from rest_framework_mongoengine import serializers as mongo_rfs
 from rest_framework_mongoengine.serializers import DocumentSerializer
 
 logger = logging.getLogger(__name__)

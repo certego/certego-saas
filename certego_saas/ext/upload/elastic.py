@@ -29,7 +29,7 @@ class AbstractBISerializer(ModelSerializer):
     def to_elastic_dict(data, index):
         return {
             "_source": data,
-            "_index": index + "-" + now().strftime("%Y.%m"),
+            "_index": index + "-" + data["environment"] + "-" + now().strftime("%Y.%m"),
             "_op_type": "index",
         }
 

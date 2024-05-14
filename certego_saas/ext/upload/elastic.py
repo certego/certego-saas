@@ -109,10 +109,11 @@ else:
 
 
 class BIDocumentSerializer(AbstractBISerializer):
+    index = rfs.CharField(source="index")
     application = rfs.CharField(source="application")
     environment = rfs.CharField(source="environment")
     timestamp = rfs.DateTimeField(source="timestamp")
-    kwargs = rfs.DictField(source="kwargs", child=rfs.CharField())
+    kwargs = rfs.DictField(source="kwargs")
 
     class Meta:
         model = BIDocument

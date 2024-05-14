@@ -114,6 +114,7 @@ class BIDocumentSerializer(AbstractBISerializer, DocumentSerializer):
 
     class Meta:
         model = BIDocument
+        fields = AbstractBISerializer.Meta.fields
 
     def to_representation(self, instance: BIDocument):
         data = super().to_representation(instance)

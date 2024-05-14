@@ -114,8 +114,9 @@ class BIDocumentSerializer(AbstractBISerializer, DocumentSerializer):
 
     class Meta:
         model = BIDocument
-        fields = AbstractBISerializer.Meta.fields + ["**kwargs"]
 
     def to_representation(self, instance: BIDocument):
         data = super().to_representation(instance)
+        for key, value in instance.kwargs.items():
+            data[key] = value
         return self.to_elastic_dict(data, instance.index)

@@ -84,6 +84,7 @@ except ImportError:
     from django.db.models import Index, JSONField, Model
     from django.db.models import fields as django_fields
 
+
     class BIDocument(__BIDocumentInterface, Model):
         index = django_fields.CharField(max_length=100)
         timestamp = django_fields.DateTimeField(auto_now_add=True)
@@ -111,7 +112,8 @@ class BIDocumentSerializer(AbstractBISerializer):
     application = rfs.CharField(source="application")
     environment = rfs.CharField(source="environment")
     timestamp = rfs.DateTimeField(source="timestamp")
-    kwargs = rfs.DictField(source="kwargs")
+    kwargs = rfs.JSONField(source="kwargs")
+
     class Meta:
         model = BIDocument
         fields = AbstractBISerializer.Meta.fields + ["kwargs"]

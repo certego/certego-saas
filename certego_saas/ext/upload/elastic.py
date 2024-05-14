@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import Any, Dict, Tuple
+from typing import Tuple
 
 from django.utils.timezone import now
 from elasticsearch.helpers import bulk
@@ -14,8 +14,8 @@ import elasticsearch
 
 
 class AbstractBISerializer(ModelSerializer):
-    application = rfs.CharField(read_only=True)
-    environment = rfs.SerializerMethodField(method_name="get_environment")
+    application: Field
+    environment: Field
     timestamp: Field
 
     class Meta:
@@ -26,15 +26,15 @@ class AbstractBISerializer(ModelSerializer):
         ]
 
     @staticmethod
-    def to_elastic_dict(data):
+    def to_elastic_dict(data, index):
         return {
             "_source": data,
-            "_index": getattr(settings, "ELASTICSEARCH_BI_INDEX") + "-" + now().strftime("%Y.%m"),
+            "_index": index + "-" + now().strftime("%Y.%m"),
             "_op_type": "index",
         }
 
+
 class __BIDocumentInterface:
-    index: str
     timestamp: datetime
     application: str
     environment: str
@@ -43,7 +43,7 @@ class __BIDocumentInterface:
     def upload(
         cls,
         client: elasticsearch.Elasticsearch,
-        serializer: AbstractBISerializer,
+        serializer,
         index: str = None,
         timeout: int = 30,
         max_number: int = None,
@@ -72,7 +72,7 @@ class __BIDocumentInterface:
         }
 
     def __repr__(self):
-        return f"|{self.index=}, {self.application=}, {self.environment=}, {self.kwargs=}"
+        return f"|{self.timestamp=}, {self.application=}, {self.environment=}"
 
 
 try:
@@ -104,3 +104,20 @@ else:
         environment = mongo_fields.StringField(required=True)
         kwargs = mongo_fields.DictField(required=False)
         meta = {"indexes": ["index", "timestamp"]}
+
+
+class BIDocumentSerializer(AbstractBISerializer):
+    application = rfs.CharField(source="application")
+    environment = rfs.CharField(source="environment")
+    timestamp = rfs.DateTimeField(source="timestamp")
+    class Meta:
+        model = BIDocument
+        fields = AbstractBISerializer.Meta.fields + ["kwargs"]
+
+    @staticmethod
+    def get_environment(instance: BIDocument):
+        return instance.environment
+
+    def to_representation(self, instance: BIDocument):
+        data = super().to_representation(instance)
+        return self.to_elastic_dict(data, instance.index)

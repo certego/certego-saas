@@ -112,7 +112,7 @@ class BIDocumentSerializer(AbstractBISerializer):
     application = rfs.CharField(source="application")
     environment = rfs.CharField(source="environment")
     timestamp = rfs.DateTimeField(source="timestamp")
-    kwargs = rfs.JSONField(source="kwargs")
+    kwargs = rfs.DictField(source="kwargs", child=rfs.CharField())
 
     class Meta:
         model = BIDocument

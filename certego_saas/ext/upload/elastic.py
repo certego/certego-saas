@@ -7,6 +7,8 @@ from elasticsearch.helpers import bulk
 from rest_framework import serializers as rfs
 from rest_framework.fields import Field
 from rest_framework.serializers import ModelSerializer
+from rest_framework_mongoengine import serializers as mongo_rfs
+from rest_framework_mongoengine.serializers import DocumentSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -108,20 +110,11 @@ else:
         meta = {"indexes": ["index", "timestamp"]}
 
 
-class BIDocumentSerializer(AbstractBISerializer):
-    index = rfs.CharField(source="index")
-    application = rfs.CharField(source="application")
-    environment = rfs.CharField(source="environment")
-    timestamp = rfs.DateTimeField(source="timestamp")
-    kwargs = rfs.DictField(source="kwargs")
+class BIDocumentSerializer(AbstractBISerializer, DocumentSerializer):
 
     class Meta:
         model = BIDocument
         fields = AbstractBISerializer.Meta.fields + ["kwargs"]
-
-    @staticmethod
-    def get_environment(instance: BIDocument):
-        return instance.environment
 
     def to_representation(self, instance: BIDocument):
         data = super().to_representation(instance)

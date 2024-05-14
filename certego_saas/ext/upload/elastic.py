@@ -60,7 +60,7 @@ class __BIDocumentInterface:
             docs = docs[:max_number]
         logger.info(f"Uploading {docs.count()} documents")
         jsons = serializer(instance=docs, many=True)
-        logger.info(f"Documents to upload: {jsons}")
+        logger.info(f"Documents to upload: {docs}")
         success, errors = bulk(client, jsons, request_timeout=timeout)
         logger.info("Finished Upload. Starting deletion documents")
         docs.delete()

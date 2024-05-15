@@ -18,3 +18,4 @@ stripe >= 2.61.0
 python-twitter ~= 3.5
 Markdown ~= 3.3.6
 elasticsearch >= 6.0.0
+mongoengine >= 0.28.2

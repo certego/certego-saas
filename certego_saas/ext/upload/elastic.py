@@ -84,7 +84,6 @@ except ImportError:
     from django.db.models import Index, JSONField, Model
     from django.db.models import fields as django_fields
 
-
     class BIDocument(__BIDocumentInterface, Model):
         index = django_fields.CharField(max_length=100)
         timestamp = django_fields.DateTimeField(auto_now_add=True)
@@ -109,7 +108,6 @@ else:
 
 
 class BIDocumentSerializer(AbstractBISerializer, DocumentSerializer):
-
     class Meta:
         model = BIDocument
         fields = AbstractBISerializer.Meta.fields

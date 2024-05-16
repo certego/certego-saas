@@ -16,13 +16,6 @@ class __AbstractBISerializer:
     environment: Field
     timestamp: Field
 
-    class Meta:
-        fields = [
-            "application",
-            "environment",
-            "timestamp",
-        ]
-
     @staticmethod
     def to_elastic_dict(data, index):
         return {
@@ -81,6 +74,7 @@ try:
 except ImportError:
     from django.db.models import Index, JSONField, Model
     from django.db.models import fields as django_fields
+    from rest_framework.fields import SerializerMethodField
     from rest_framework.serializers import ModelSerializer
 
     class BIDocument(__BIDocumentInterface, Model):
@@ -94,7 +88,14 @@ except ImportError:
             indexes = [Index(fields=["index"]), Index(fields=["timestamp"])]
 
     class BISerializer(__AbstractBISerializer, ModelSerializer):
-        ...
+        index = SerializerMethodField(method_name="get_index")
+
+        class Meta:
+            fields = [
+                "application",
+                "environment",
+                "timestamp",
+            ]
 
 else:
     from rest_framework_mongoengine.serializers import DocumentSerializer
@@ -112,7 +113,11 @@ else:
     class BISerializer(__AbstractBISerializer, DocumentSerializer):
         class Meta:
             model = BIDocument
-            fields = __AbstractBISerializer.Meta.fields
+            fields = [
+                "application",
+                "environment",
+                "timestamp",
+            ]
 
         def to_representation(self, instance: BIDocument):
             data = super().to_representation(instance)

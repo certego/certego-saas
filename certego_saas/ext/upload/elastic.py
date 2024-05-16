@@ -5,15 +5,13 @@ from typing import Tuple
 from django.utils.timezone import now
 from elasticsearch.helpers import bulk
 from rest_framework.fields import Field
-from rest_framework.serializers import ModelSerializer
-from rest_framework_mongoengine.serializers import DocumentSerializer
 
 logger = logging.getLogger(__name__)
 
 import elasticsearch
 
 
-class AbstractBISerializer(ModelSerializer):
+class __AbstractBISerializer:
     application: Field
     environment: Field
     timestamp: Field
@@ -83,6 +81,7 @@ try:
 except ImportError:
     from django.db.models import Index, JSONField, Model
     from django.db.models import fields as django_fields
+    from rest_framework.serializers import ModelSerializer
 
     class BIDocument(__BIDocumentInterface, Model):
         index = django_fields.CharField(max_length=100)
@@ -94,7 +93,11 @@ except ImportError:
         class Meta:
             indexes = [Index(fields=["index"]), Index(fields=["timestamp"])]
 
+    class BISerializer(__AbstractBISerializer, ModelSerializer):
+        ...
+
 else:
+    from rest_framework_mongoengine.serializers import DocumentSerializer
 
     class BIDocument(__BIDocumentInterface, Document):
         index = mongo_fields.StringField(required=True)
@@ -106,14 +109,13 @@ else:
         kwargs = mongo_fields.DictField(required=False)
         meta = {"indexes": ["index", "timestamp"]}
 
+    class BISerializer(__AbstractBISerializer, DocumentSerializer):
+        class Meta:
+            model = BIDocument
+            fields = __AbstractBISerializer.Meta.fields
 
-class BIDocumentSerializer(AbstractBISerializer, DocumentSerializer):
-    class Meta:
-        model = BIDocument
-        fields = AbstractBISerializer.Meta.fields
-
-    def to_representation(self, instance: BIDocument):
-        data = super().to_representation(instance)
-        for key, value in instance.kwargs.items():
-            data[key] = value
-        return self.to_elastic_dict(data, instance.index)
+        def to_representation(self, instance: BIDocument):
+            data = super().to_representation(instance)
+            for key, value in instance.kwargs.items():
+                data[key] = value
+            return self.to_elastic_dict(data, instance.index)

@@ -4,7 +4,6 @@ django-filter >= 21.1
 django-cache-memoize >= 0.1.10
 django-user-agents >= 0.4.0
 djangorestframework >= 3.12.0
-django-rest-framework-mongoengine==3.4.1
 drf-spectacular >= 0.21.1
 drf-flex-fields >= 0.9.6
 djangorestframework-filters >= 1.0.0.dev2
@@ -18,4 +17,3 @@ stripe >= 2.61.0
 python-twitter ~= 3.5
 Markdown ~= 3.3.6
 elasticsearch >= 6.0.0
-mongoengine >= 0.26.0

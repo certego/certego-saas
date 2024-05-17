@@ -2,6 +2,10 @@
 
 **[Get it on PyPi](https://pypi.org/project/certego-saas/)**
 
+## 0.7.10
+Update elastic document format + added serializers 
+
+
 ## 0.7.9
 Elastic BI support for v8
 

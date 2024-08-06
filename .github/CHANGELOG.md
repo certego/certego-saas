@@ -2,6 +2,9 @@
 
 **[Get it on PyPi](https://pypi.org/project/certego-saas/)**
 
+## 0.7.11
+fixed noisy log for BI
+
 ## 0.7.10
 Update elastic document format + added serializers 
 

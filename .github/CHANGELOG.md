@@ -2,6 +2,9 @@
 
 **[Get it on PyPi](https://pypi.org/project/certego-saas/)**
 
+## [0.7.12](https://github.com/certego/certego-saas/releases/tag/0.7.12)
+Added [CLA](https://github.com/certego/certego-saas/blob/main/CONTRIBUTING.md)
+
 ## 0.7.11
 fixed noisy log for BI
 
@@ -12,7 +15,7 @@ Update elastic document format + added serializers
 ## 0.7.9
 Elastic BI support for v8
 
-## [0.7.3](https://github.com/certego/certego-saas/releases/tag/0.1.1)
+## [0.7.3](https://github.com/certego/certego-saas/releases/tag/0.7.3)
 
 **New features:**
 - Admin can invite users to join the organization and revoke the invitations.
